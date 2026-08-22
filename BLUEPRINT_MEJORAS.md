@@ -101,12 +101,14 @@ GEMINI_FALLBACK_MODELS       (opcional)
 
 ## 4. Cómo republicar en AI Studio (vía GitHub — recomendado)
 
-1. El código mejorado está en el repo `matriz-maker-holding` (o el repo GitHub al que
-   se conecte). Asegurar que `.env.local` NO se suba (ya está en `.gitignore`).
-2. En AI Studio (app abierta): conectar el app a GitHub o **importar/crear desde el repo**
-   (Build → conectar repo). Push a la rama principal = despliegue automático.
-3. En los **Secrets** del app pegar las 5 variables de la sección 2.
-4. Publicar/Deploy. El link `https://holding-wpc-log.ai.studio` (u otro) servirá la
+El código mejorado YA está en GitHub (privado):
+**`https://github.com/rafaelfflorez-ctrl/holding-wpc-app`** (rama `master`).
+
+1. En AI Studio, abre tu app (`aistudio.google.com/apps/327086c2-...`).
+2. Conecta/importa el código desde el repo de GitHub (Build → conectar repo, o crea
+   el app desde el repo). Los push a `master` despliegan automáticamente.
+3. En los **Secrets** del app pega las 5 variables de la sección 2.
+4. Publicar/Deploy. El link (`https://holding-wpc-log.ai.studio` u otro) servirá la
    versión mejorada.
 
 Alternativa de host permanente si no se usa AI Studio: Render/Railway/Fly con el mismo
