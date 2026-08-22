@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Session, SupabaseClient } from "@supabase/supabase-js";
 import {
   fetchConfig,
@@ -6,6 +6,7 @@ import {
   isSupabaseConfigured,
   AppConfig,
 } from "../lib/supabase";
+import { apiFetch } from "../lib/api";
 import {
   UserProfile,
   UserRole,
@@ -83,7 +84,7 @@ function resolveCurrentUser(users: UserProfile[], session: Session): UserProfile
   const email = session.user?.email?.toLowerCase() || "";
   const found = users.find((u) => u.email?.toLowerCase() === email);
   if (found) return found;
-  // Perfil no existe aún -> crear uno por defecto (AUXILIAR_CONTABLE).
+  // Perfil no existe aÃºn -> crear uno por defecto (AUXILIAR_CONTABLE).
   return {
     id: session.user.id,
     name: session.user.user_metadata?.name || session.user.email || "Usuario",
@@ -121,7 +122,7 @@ export function useHoldingData() {
   const sessionRef = useRef<Session | null>(null);
   sessionRef.current = session;
 
-  // Estado inicial: configuración + restauración de sesión + carga de datos.
+  // Estado inicial: configuraciÃ³n + restauraciÃ³n de sesiÃ³n + carga de datos.
   useEffect(() => {
     let active = true;
     (async () => {
@@ -165,7 +166,7 @@ export function useHoldingData() {
 
   const login = useCallback(async (email: string, password: string) => {
     const supabase = clientRef.current;
-    if (!supabase) throw new Error("Supabase no está configurado.");
+    if (!supabase) throw new Error("Supabase no estÃ¡ configurado.");
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
     const profiles = await loadAllData(supabase, data.session, {
@@ -189,7 +190,7 @@ export function useHoldingData() {
     try {
       await clientRef.current?.auth.signOut();
     } catch (e) {
-      console.warn("Error al cerrar sesión", e);
+      console.warn("Error al cerrar sesiÃ³n", e);
     }
     setSession(null);
     setCurrentUser(null);
@@ -231,7 +232,7 @@ export function useHoldingData() {
         setSyncStatus("saved");
         setLastSyncError(null);
       } catch (e: any) {
-        console.error("Persistencia falló:", e);
+        console.error("Persistencia fallÃ³:", e);
         setSyncStatus("error");
         setLastSyncError(e?.message || String(e));
       }
@@ -239,10 +240,10 @@ export function useHoldingData() {
     return () => clearTimeout(t);
   }, [dataSnapshot, session]);
 
-  // Crear usuario desde el panel de administración (requiere SUPABASE_SERVICE_ROLE_KEY).
+  // Crear usuario desde el panel de administraciÃ³n (requiere SUPABASE_SERVICE_ROLE_KEY).
   const createUserAccount = useCallback(
     async (payload: { email: string; password: string; name: string; role: UserRole; title?: string }) => {
-      const res = await fetch("/api/auth/create-user", {
+      const res = await apiFetch("/api/auth/create-user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

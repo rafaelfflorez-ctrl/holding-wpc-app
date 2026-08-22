@@ -19,6 +19,51 @@ const GEMINI_FALLBACK_MODELS = (process.env.GEMINI_FALLBACK_MODELS || "gemini-3.
 
 const sleepMs = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+// ---------------------------------------------------------------------------
+// AUTENTICACIÓN de las rutas del servidor (seguridad B1)
+// Exige una sesión válida de Supabase (Bearer token) y, cuando aplica, rol ADMIN.
+// ---------------------------------------------------------------------------
+class HttpError extends Error {
+  status: number;
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+  }
+}
+
+function getServiceClient() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return createSupabaseClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+}
+
+async function requireAuth(req: any): Promise<{ user: any; role: string | null }> {
+  const header = req?.headers?.authorization || "";
+  const token = header.startsWith("Bearer ") ? header.slice(7).trim() : "";
+  if (!token) throw new HttpError(401, "No autorizado: inicie sesión para continuar.");
+  const sb = getServiceClient();
+  if (!sb) throw new HttpError(500, "El servidor no tiene SUPABASE_SERVICE_ROLE_KEY configurada.");
+  const { data, error } = await sb.auth.getUser(token);
+  if (error || !data?.user) throw new HttpError(401, "Sesión inválida o expirada. Inicie sesión de nuevo.");
+  const { data: profile } = await sb
+    .from("users")
+    .select("role")
+    .eq("id", data.user.id)
+    .maybeSingle();
+  return { user: data.user, role: profile?.role || null };
+}
+
+async function requireAdmin(req: any) {
+  const auth = await requireAuth(req);
+  if (auth.role !== "ADMINISTRADOR") {
+    throw new HttpError(403, "Solo un ADMINISTRADOR puede realizar esta operación.");
+  }
+  return auth;
+}
+
 // Llama a Gemini probando varios modelos ante saturación temporal (HTTP 503).
 async function generateWithRetry(ai: any, contents: any, config: any) {
   const models = [GEMINI_MODEL, ...GEMINI_FALLBACK_MODELS.filter((m) => m !== GEMINI_MODEL)];
@@ -261,6 +306,7 @@ async function startServer() {
   // Requires SUPABASE_SERVICE_ROLE_KEY in server secrets.
   app.post("/api/auth/create-user", async (req, res) => {
     try {
+      await requireAdmin(req);
       const { email, password, name, role, title } = req.body || {};
       if (!email || !password || !name) {
         return res.status(400).json({ error: "email, password y name son obligatorios." });
@@ -309,14 +355,18 @@ async function startServer() {
 
       res.json({ ok: true, user: profile });
     } catch (e: any) {
+      if (e instanceof HttpError) {
+        return res.status(e.status).json({ error: e.message });
+      }
       console.error("Error creando usuario:", e);
       res.status(500).json({ error: e?.message || "Error al crear el usuario." });
     }
   });
-
   // API Route to analyze an existing quote
-  app.post("/api/analyze-quote", async (req, res) => {    const { fileName = "documento", fileType = "", fileData, companyId = "WPC", userInstruction } = req.body || {};
+  app.post("/api/analyze-quote", async (req, res) => {
+    const { fileName = "documento", fileType = "", fileData, companyId = "WPC", userInstruction } = req.body || {};
     try {
+      await requireAuth(req);
       const apiKey = process.env.GEMINI_API_KEY;
 
       if (!apiKey) {
@@ -495,6 +545,9 @@ Pautas obligatorias:
       });
 
     } catch (err: any) {
+      if (err instanceof HttpError) {
+        return res.status(err.status).json({ error: err.message });
+      }
       console.error("Error analyzing quote with Gemini:", err);
       const apiKey = process.env.GEMINI_API_KEY;
       if (apiKey) {
@@ -522,6 +575,7 @@ Pautas obligatorias:
   app.post("/api/analyze-po", async (req, res) => {
     const { fileName = "documento", fileType = "", fileData, companyId = "WPC", userInstruction } = req.body || {};
     try {
+      await requireAuth(req);
       const apiKey = process.env.GEMINI_API_KEY;
 
       if (!apiKey) {
@@ -633,6 +687,9 @@ Importante:
       });
 
     } catch (err: any) {
+      if (err instanceof HttpError) {
+        return res.status(err.status).json({ error: err.message });
+      }
       console.error("Error analyzing PO with Gemini:", err);
       const apiKey = process.env.GEMINI_API_KEY;
       if (apiKey) {
@@ -654,6 +711,7 @@ Importante:
   // API Route for AI Advisor powered by Google Gemini
   app.post("/api/ai-expert", async (req, res) => {
     try {
+      await requireAuth(req);
       const { prompt, inventory, profits } = req.body;
       const apiKey = process.env.GEMINI_API_KEY;
       if (!apiKey) {
@@ -708,6 +766,9 @@ Mantén el estilo profesional, ordenado con viñetas, sin explicaciones técnica
 
       res.json({ reply: response?.text || "No se pudo generar respuesta." });
     } catch (error: any) {
+      if (error instanceof HttpError) {
+        return res.status(error.status).json({ error: error.message });
+      }
       console.error("Gemini Error:", error);
       res.status(500).json({ error: error.message || "Error al conectar con el asesor de inteligencia artificial." });
     }
