@@ -1,0 +1,6 @@
+{
+  "name": "MATRIZ MAKER HOLDING",
+  "description": "Plataforma matriz de control multi-compañía para Matriz Maker Holding (WPC Autopartes, Fundación She Maker, Raez Ingeniería, Helenamar Inmobiliaria). Permite control consolidado, emisión de órdenes de compra con IA, estados de pérdidas y ganancias segmentados e individualizados.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
