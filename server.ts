@@ -1,4 +1,4 @@
-import express from "express";
+﻿import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
@@ -9,9 +9,11 @@ import dotenv from "dotenv";
 dotenv.config();
 dotenv.config({ path: ".env.local", override: true });
 
-// Modelo de Gemini configurable vía env (AI Studio inyecta los secrets).
+// Modelo de Gemini configurable vÃ­a env (AI Studio inyecta los secrets).
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.6-flash";
-// Cadena de respaldo ante saturación (503) o modelos no disponibles (404).
+// Clave de Gemini: soporta GEMINI_API_KEY o GEMINI_API_KEY_2 (fallback para cuentas con Default Key fija).
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY_2 || "";
+// Cadena de respaldo ante saturaciÃ³n (503) o modelos no disponibles (404).
 const GEMINI_FALLBACK_MODELS = (process.env.GEMINI_FALLBACK_MODELS || "gemini-3.7-flash,gemini-flash-latest")
   .split(",")
   .map((s) => s.trim())
@@ -20,8 +22,8 @@ const GEMINI_FALLBACK_MODELS = (process.env.GEMINI_FALLBACK_MODELS || "gemini-3.
 const sleepMs = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 // ---------------------------------------------------------------------------
-// AUTENTICACIÓN de las rutas del servidor (seguridad B1)
-// Exige una sesión válida de Supabase (Bearer token) y, cuando aplica, rol ADMIN.
+// AUTENTICACIÃ“N de las rutas del servidor (seguridad B1)
+// Exige una sesiÃ³n vÃ¡lida de Supabase (Bearer token) y, cuando aplica, rol ADMIN.
 // ---------------------------------------------------------------------------
 class HttpError extends Error {
   status: number;
@@ -43,11 +45,11 @@ function getServiceClient() {
 async function requireAuth(req: any): Promise<{ user: any; role: string | null }> {
   const header = req?.headers?.authorization || "";
   const token = header.startsWith("Bearer ") ? header.slice(7).trim() : "";
-  if (!token) throw new HttpError(401, "No autorizado: inicie sesión para continuar.");
+  if (!token) throw new HttpError(401, "No autorizado: inicie sesiÃ³n para continuar.");
   const sb = getServiceClient();
   if (!sb) throw new HttpError(500, "El servidor no tiene SUPABASE_SERVICE_ROLE_KEY configurada.");
   const { data, error } = await sb.auth.getUser(token);
-  if (error || !data?.user) throw new HttpError(401, "Sesión inválida o expirada. Inicie sesión de nuevo.");
+  if (error || !data?.user) throw new HttpError(401, "SesiÃ³n invÃ¡lida o expirada. Inicie sesiÃ³n de nuevo.");
   const { data: profile } = await sb
     .from("users")
     .select("role")
@@ -59,12 +61,12 @@ async function requireAuth(req: any): Promise<{ user: any; role: string | null }
 async function requireAdmin(req: any) {
   const auth = await requireAuth(req);
   if (auth.role !== "ADMINISTRADOR") {
-    throw new HttpError(403, "Solo un ADMINISTRADOR puede realizar esta operación.");
+    throw new HttpError(403, "Solo un ADMINISTRADOR puede realizar esta operaciÃ³n.");
   }
   return auth;
 }
 
-// Llama a Gemini probando varios modelos ante saturación temporal (HTTP 503) o cuota (429).
+// Llama a Gemini probando varios modelos ante saturaciÃ³n temporal (HTTP 503) o cuota (429).
 async function generateWithRetry(ai: any, contents: any, config: any) {
   const models = [GEMINI_MODEL, ...GEMINI_FALLBACK_MODELS.filter((m) => m !== GEMINI_MODEL)];
   let lastErr: any = null;
@@ -98,7 +100,7 @@ async function generateWithRetry(ai: any, contents: any, config: any) {
   throw lastErr || new Error("Gemini no disponible (todos los modelos saturados o con cuota agotada).");
 }
 
-// Mapea un error de la API a un código HTTP útil para la respuesta al cliente.
+// Mapea un error de la API a un cÃ³digo HTTP Ãºtil para la respuesta al cliente.
 function statusFromError(e: any): number {
   const s = String(e?.status || "");
   const str = JSON.stringify(e);
@@ -110,8 +112,8 @@ function statusFromError(e: any): number {
 
 function friendlyGeminiError(e: any): string {
   const status = statusFromError(e);
-  if (status === 429) return "Límite de cuota de Gemini alcanzado. Espera ~1 minuto o usa tu propia GEMINI_API_KEY con mayor límite.";
-  if (status === 503) return "Gemini está saturado temporalmente. Inténtalo de nuevo en unos segundos.";
+  if (status === 429) return "LÃ­mite de cuota de Gemini alcanzado. Espera ~1 minuto o usa tu propia GEMINI_API_KEY con mayor lÃ­mite.";
+  if (status === 503) return "Gemini estÃ¡ saturado temporalmente. IntÃ©ntalo de nuevo en unos segundos.";
   return e?.message || "Error al procesar con Gemini.";
 }
 
@@ -146,11 +148,11 @@ async function startServer() {
         for (const sheetName of workbook.SheetNames) {
           const sheet = workbook.Sheets[sheetName];
           const csv = XLSX.utils.sheet_to_csv(sheet);
-          combinedCsv += `\n--- HOJA / PESTAÑA: ${sheetName} ---\n${csv}\n`;
+          combinedCsv += `\n--- HOJA / PESTAÃ‘A: ${sheetName} ---\n${csv}\n`;
         }
         return {
           type: "text" as const,
-          content: `[CONTENIDO EXTRAÍDO DE ARCHIVO EXCEL/HOJA DE CÁLCULO "${fileName}"]:\n${combinedCsv}`
+          content: `[CONTENIDO EXTRAÃDO DE ARCHIVO EXCEL/HOJA DE CÃLCULO "${fileName}"]:\n${combinedCsv}`
         };
       } catch (err) {
         console.error("Error reading Excel with xlsx:", err);
@@ -222,19 +224,19 @@ async function startServer() {
         { code: "FR-DISC-102", description: "Pares Discos Ventilados Brembo 300mm", quantity: 4, unitPrice: 510000, total: 2040000 }
       ];
     } else if (companyId === "FUNDACION") {
-      customer = "Alcaldía Mayor de Bogotá (Desarrollo Social)";
+      customer = "AlcaldÃ­a Mayor de BogotÃ¡ (Desarrollo Social)";
       items = [
-        { code: "FND-TLL-10", description: "Talleres Formativos en Robótica & Arduino para 50 Niñas", quantity: 1, unitPrice: 8500000, total: 8500000 }
+        { code: "FND-TLL-10", description: "Talleres Formativos en RobÃ³tica & Arduino para 50 NiÃ±as", quantity: 1, unitPrice: 8500000, total: 8500000 }
       ];
     } else if (companyId === "RAEZ") {
       customer = "Ingenio Azucarero Manuelita S.A.";
       items = [
-        { code: "RZ-PROJ-CNC", description: "Diseño, Mecanizado CNC y Soldadura de Vástago de Prensa", quantity: 1, unitPrice: 12800000, total: 12800000 }
+        { code: "RZ-PROJ-CNC", description: "DiseÃ±o, Mecanizado CNC y Soldadura de VÃ¡stago de Prensa", quantity: 1, unitPrice: 12800000, total: 12800000 }
       ];
     } else if (companyId === "HELENAMAR") {
-      customer = "Sra. Carmen Villalobos (Corretaje Turístico)";
+      customer = "Sra. Carmen Villalobos (Corretaje TurÃ­stico)";
       items = [
-        { code: "HMR-SERV-30", description: "Servicios de Limpieza Profunda, Lavandería y Logística", quantity: 6, unitPrice: 300000, total: 1800000 }
+        { code: "HMR-SERV-30", description: "Servicios de Limpieza Profunda, LavanderÃ­a y LogÃ­stica", quantity: 6, unitPrice: 300000, total: 1800000 }
       ];
     }
 
@@ -249,7 +251,7 @@ async function startServer() {
       customerNit: "900.582.493-1",
       customerPhone: "+57 (315) 890-4412",
       customerEmail: "compras@tercerocolombia.co",
-      customerAddress: "Calle Industrial # 10-25, Bogotá D.C.",
+      customerAddress: "Calle Industrial # 10-25, BogotÃ¡ D.C.",
       validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
       items,
       subtotal,
@@ -263,11 +265,11 @@ async function startServer() {
 
   function simulateOfflineLearning(fileName: string, companyId: string) {
     return {
-      valoresCotizadosAnalysis: `[OFFLINE IA] Tarifas evaluadas para ${companyId}. Se encuentran dentro del rango óptimo histórico para Bogotá con una dispersión de ±4.2%.`,
-      tiempoEstimadoEjecucion: "Estimado entre 6 y 14 días calendarios según carga del holding actual.",
+      valoresCotizadosAnalysis: `[OFFLINE IA] Tarifas evaluadas para ${companyId}. Se encuentran dentro del rango Ã³ptimo histÃ³rico para BogotÃ¡ con una dispersiÃ³n de Â±4.2%.`,
+      tiempoEstimadoEjecucion: "Estimado entre 6 y 14 dÃ­as calendarios segÃºn carga del holding actual.",
       viabilidadUtilidad: `[OFFLINE IA] Rentabilidad estimada en un 38.5% neto. Cumple con el objetivo del holding de un margen superior al 30%.`,
-      sobrecostos: "[OFFLINE IA] Riesgo menor de sobrecostos en materiales de taller. Se sugiere asegurar insumos antes de 15 días.",
-      imprevistos: "[OFFLINE IA] Se sugiere constituir reserva contable técnica del 7.5% por eventuales novedades imprevistas de entrega."
+      sobrecostos: "[OFFLINE IA] Riesgo menor de sobrecostos en materiales de taller. Se sugiere asegurar insumos antes de 15 dÃ­as.",
+      imprevistos: "[OFFLINE IA] Se sugiere constituir reserva contable tÃ©cnica del 7.5% por eventuales novedades imprevistas de entrega."
     };
   }
 
@@ -276,24 +278,24 @@ async function startServer() {
     let items = [{ code: "INS-GEN", description: "Insumos Varios del Documento", quantity: 1, unitCost: 1500000, total: 1500000 }];
 
     if (companyId === "WPC") {
-      supplier = "Brembo Parts Europe S.P.A. (Milán)";
+      supplier = "Brembo Parts Europe S.P.A. (MilÃ¡n)";
       items = [
-        { code: "BRM-IMP-9", description: "Importación Pastillas Cerámicas Brembo Brembo-X", quantity: 50, unitCost: 120000, total: 6000000 }
+        { code: "BRM-IMP-9", description: "ImportaciÃ³n Pastillas CerÃ¡micas Brembo Brembo-X", quantity: 50, unitCost: 120000, total: 6000000 }
       ];
     } else if (companyId === "FUNDACION") {
-      supplier = "Ferretería Arduino Robot Store Bogotá";
+      supplier = "FerreterÃ­a Arduino Robot Store BogotÃ¡";
       items = [
         { code: "FND-INS-2", description: "Placas Arduino Nano, Sensores Ultrasonido y Jumpers", quantity: 30, unitCost: 45000, total: 1350000 }
       ];
     } else if (companyId === "RAEZ") {
-      supplier = "Siderúrgica del Pacífico (Aceros S.A.)";
+      supplier = "SiderÃºrgica del PacÃ­fico (Aceros S.A.)";
       items = [
-        { code: "RZ-AC-02", description: "Láminas de Acero Inoxidable 316L Calibre 1/4", quantity: 8, unitCost: 850000, total: 6800000 }
+        { code: "RZ-AC-02", description: "LÃ¡minas de Acero Inoxidable 316L Calibre 1/4", quantity: 8, unitCost: 850000, total: 6800000 }
       ];
     } else if (companyId === "HELENAMAR") {
       supplier = "Distribuidora HomeCenter Santa Marta";
       items = [
-        { code: "HM-LIMP-10", description: "Kits de Aseo, Lencería de Cama Premium y Toallas", quantity: 5, unitCost: 280000, total: 1400000 }
+        { code: "HM-LIMP-10", description: "Kits de Aseo, LencerÃ­a de Cama Premium y Toallas", quantity: 5, unitCost: 280000, total: 1400000 }
       ];
     }
 
@@ -307,7 +309,7 @@ async function startServer() {
       items,
       total,
       status: "CREADO",
-      notes: "Generado de forma autónoma por IA desde documento de compra previo " + fileName,
+      notes: "Generado de forma autÃ³noma por IA desde documento de compra previo " + fileName,
       carrier: "DHL Express",
       etaDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
     };
@@ -318,13 +320,13 @@ async function startServer() {
     res.json({
       supabaseUrl: process.env.SUPABASE_URL || "",
       supabaseAnonKey: process.env.SUPABASE_ANON_KEY || "",
-      hasGeminiKey: Boolean(process.env.GEMINI_API_KEY),
+      hasGeminiKey: Boolean(GEMINI_API_KEY),
       hasServiceRole: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
       modelName: GEMINI_MODEL,
     });
   });
 
-  // Create an application user (profile + Supabase Auth) — admin only via UI.
+  // Create an application user (profile + Supabase Auth) â€” admin only via UI.
   // Requires SUPABASE_SERVICE_ROLE_KEY in server secrets.
   app.post("/api/auth/create-user", async (req, res) => {
     try {
@@ -337,7 +339,7 @@ async function startServer() {
       const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
       if (!supabaseUrl || !serviceKey) {
         return res.status(400).json({
-          error: "SUPABASE_SERVICE_ROLE_KEY no está configurada en los secrets del servidor.",
+          error: "SUPABASE_SERVICE_ROLE_KEY no estÃ¡ configurada en los secrets del servidor.",
         });
       }
       const admin = createSupabaseClient(supabaseUrl, serviceKey, {
@@ -389,7 +391,7 @@ async function startServer() {
     const { fileName = "documento", fileType = "", fileData, companyId = "WPC", userInstruction } = req.body || {};
     try {
       await requireAuth(req);
-      const apiKey = process.env.GEMINI_API_KEY;
+      const apiKey = GEMINI_API_KEY;
 
       if (!apiKey) {
         return res.json({
@@ -426,25 +428,25 @@ async function startServer() {
       }
       
       let basePrompt = `Eres un auditor financiero y extractor experto de documentos de compras, presupuestos y cotizaciones para la empresa "${companyId}" en nuestro holding empresarial.
-Analiza este documento comercial adjunto (puede ser una fotografía tomada con celular, imagen escaneada, captura de pantalla, PDF, Excel o presupuesto en papel).
-Realiza una lectura OCR minuciosa de todos los textos, tablas, filas de ítems, cantidades, costos, referencias, fechas, notas y totales.
+Analiza este documento comercial adjunto (puede ser una fotografÃ­a tomada con celular, imagen escaneada, captura de pantalla, PDF, Excel o presupuesto en papel).
+Realiza una lectura OCR minuciosa de todos los textos, tablas, filas de Ã­tems, cantidades, costos, referencias, fechas, notas y totales.
 
-Extrae la información con máxima fidelidad e inteligencia y adáptala a nuestro esquema JSON.
+Extrae la informaciÃ³n con mÃ¡xima fidelidad e inteligencia y adÃ¡ptala a nuestro esquema JSON.
 
-El resultado debe ser estrictamente un JSON válido con la siguiente estructura:
+El resultado debe ser estrictamente un JSON vÃ¡lido con la siguiente estructura:
 {
   "customer": "Nombre del cliente, empresa o destinatario que figura en el documento",
-  "customerNit": "NIT o cédula del cliente si figura",
-  "customerPhone": "Teléfono de contacto si figura",
-  "customerEmail": "Correo electrónico si figura",
-  "customerAddress": "Dirección física si figura",
+  "customerNit": "NIT o cÃ©dula del cliente si figura",
+  "customerPhone": "TelÃ©fono de contacto si figura",
+  "customerEmail": "Correo electrÃ³nico si figura",
+  "customerAddress": "DirecciÃ³n fÃ­sica si figura",
   "validUntil": "Fecha de validez (YYYY-MM-DD)",
-  "quoteReference": "Referencia, consecutivo, folio o código de la cotización o factura (ej: COT-2026-99)",
-  "quoteDate": "Fecha de creación, emisión o vigencia que figure en el documento original (YYYY-MM-DD)",
+  "quoteReference": "Referencia, consecutivo, folio o cÃ³digo de la cotizaciÃ³n o factura (ej: COT-2026-99)",
+  "quoteDate": "Fecha de creaciÃ³n, emisiÃ³n o vigencia que figure en el documento original (YYYY-MM-DD)",
   "items": [
     {
-      "code": "Código de artículo o servicio (ej: REF-001)",
-      "description": "Descripción clara del artículo o servicio cotizado",
+      "code": "CÃ³digo de artÃ­culo o servicio (ej: REF-001)",
+      "description": "DescripciÃ³n clara del artÃ­culo o servicio cotizado",
       "quantity": 1,
       "unitCost": 80000,
       "profitMarginPercent": 25,
@@ -455,24 +457,24 @@ El resultado debe ser estrictamente un JSON válido con la siguiente estructura:
   "subtotal": 100000,
   "taxAmount": 19000,
   "total": 119000,
-  "notes": "Notas, términos o condiciones comerciales presentes en el documento",
+  "notes": "Notas, tÃ©rminos o condiciones comerciales presentes en el documento",
   "learning": {
-    "valoresCotizadosAnalysis": "Análisis comparativo de los precios cotizados frente al mercado actual",
-    "tiempoEstimadoEjecucion": "Estimación del tiempo de ejecución o entrega del servicio/producto",
-    "viabilidadUtilidad": "Análisis de rentabilidad y margen de utilidad estimado para el holding",
-    "sobrecostos": "Posibles sobrecostos detectados o riesgos de variación de costos",
-    "imprevistos": "Cálculo o sugerencias para contingencias e imprevistos"
+    "valoresCotizadosAnalysis": "AnÃ¡lisis comparativo de los precios cotizados frente al mercado actual",
+    "tiempoEstimadoEjecucion": "EstimaciÃ³n del tiempo de ejecuciÃ³n o entrega del servicio/producto",
+    "viabilidadUtilidad": "AnÃ¡lisis de rentabilidad y margen de utilidad estimado para el holding",
+    "sobrecostos": "Posibles sobrecostos detectados o riesgos de variaciÃ³n de costos",
+    "imprevistos": "CÃ¡lculo o sugerencias para contingencias e imprevistos"
   }
 }
 
 Pautas obligatorias:
-- Si el documento es una fotografía o imagen, lee con atención todas las filas de texto, valores manuscritos o impresos y tablas.
-- Genera los valores numéricos en pesos colombianos (COP) limpios de puntos o caracteres especiales.
-- Si no figura explícitamente el costo base (unitCost), calcula unitCost asumiendo un margen sugerido del 25% o deduce unitCost = unitPrice / 1.25.
-- Deduce datos faltantes de manera coherente según la actividad de ${companyId}.`;
+- Si el documento es una fotografÃ­a o imagen, lee con atenciÃ³n todas las filas de texto, valores manuscritos o impresos y tablas.
+- Genera los valores numÃ©ricos en pesos colombianos (COP) limpios de puntos o caracteres especiales.
+- Si no figura explÃ­citamente el costo base (unitCost), calcula unitCost asumiendo un margen sugerido del 25% o deduce unitCost = unitPrice / 1.25.
+- Deduce datos faltantes de manera coherente segÃºn la actividad de ${companyId}.`;
 
       if (userInstruction) {
-        basePrompt += `\n\nINSTRUCCIÓN ADICIONAL DE CONTEXTO DADA POR EL USUARIO: "${userInstruction}". Aplica estrictamente estas pautas al procesar el documento.`;
+        basePrompt += `\n\nINSTRUCCIÃ“N ADICIONAL DE CONTEXTO DADA POR EL USUARIO: "${userInstruction}". Aplica estrictamente estas pautas al procesar el documento.`;
       }
 
       parts.push({ text: basePrompt });
@@ -507,7 +509,7 @@ Pautas obligatorias:
           total
         };
       }) : [
-        { code: "GEN-01", description: `Servicio/Insumo extraído de ${fileName}`, quantity: 1, unitCost: 80000, profitMarginPercent: 25, profitAmount: 20000, unitPrice: 100000, total: 100000 }
+        { code: "GEN-01", description: `Servicio/Insumo extraÃ­do de ${fileName}`, quantity: 1, unitCost: 80000, profitMarginPercent: 25, profitAmount: 20000, unitPrice: 100000, total: 100000 }
       ];
 
       let totalCost = 0;
@@ -552,10 +554,10 @@ Pautas obligatorias:
 
       const learningResult = parsed.learning || {
         valoresCotizadosAnalysis: "Precios evaluados y compatibles con tarifas del mercado nacional.",
-        tiempoEstimadoEjecucion: "Plazo estándar según disponibilidad de insumos.",
+        tiempoEstimadoEjecucion: "Plazo estÃ¡ndar segÃºn disponibilidad de insumos.",
         viabilidadUtilidad: "Margen operativo proyectado superior al 30%.",
-        sobrecostos: "Sin riesgo crítico de sobrecostos detectado.",
-        imprevistos: "Se aconseja una previsión del 5% para imprevistos."
+        sobrecostos: "Sin riesgo crÃ­tico de sobrecostos detectado.",
+        imprevistos: "Se aconseja una previsiÃ³n del 5% para imprevistos."
       };
 
       res.json({
@@ -571,17 +573,17 @@ Pautas obligatorias:
         return res.status(err.status).json({ error: err.message });
       }
       console.error("Error analyzing quote with Gemini:", err);
-      const apiKey = process.env.GEMINI_API_KEY;
+      const apiKey = GEMINI_API_KEY;
       if (apiKey) {
-        // La clave existe pero la llamada falló (saturación, red, formato).
+        // La clave existe pero la llamada fallÃ³ (saturaciÃ³n, red, formato).
         return res.json({
           success: false,
           isDemo: false,
           isError: true,
-          errorMessage: "Gemini no pudo procesar el documento en este momento (saturación temporal del modelo). Inténtalo de nuevo en unos segundos."
+          errorMessage: "Gemini no pudo procesar el documento en este momento (saturaciÃ³n temporal del modelo). IntÃ©ntalo de nuevo en unos segundos."
         });
       }
-      // Sin API key: modo demo explícito.
+      // Sin API key: modo demo explÃ­cito.
       const fallbackEstimate = simulateOfflineQuote(fileName, companyId);
       res.json({
         success: true,
@@ -598,7 +600,7 @@ Pautas obligatorias:
     const { fileName = "documento", fileType = "", fileData, companyId = "WPC", userInstruction } = req.body || {};
     try {
       await requireAuth(req);
-      const apiKey = process.env.GEMINI_API_KEY;
+      const apiKey = GEMINI_API_KEY;
 
       if (!apiKey) {
         return res.json({
@@ -634,19 +636,19 @@ Pautas obligatorias:
       }
 
       let basePrompt = `Eres un auditor de compras y adquisiciones de la empresa "${companyId}" en nuestro holding empresarial.
-Analiza esta fotografía, cotización de proveedor, presupuesto, factura o documento de insumos/repuestos.
-Realiza OCR exhaustivo para extraer todos los ítems, cantidades, costos unitarios, el nombre del proveedor y la referencia del documento original.
+Analiza esta fotografÃ­a, cotizaciÃ³n de proveedor, presupuesto, factura o documento de insumos/repuestos.
+Realiza OCR exhaustivo para extraer todos los Ã­tems, cantidades, costos unitarios, el nombre del proveedor y la referencia del documento original.
 Genera una Orden de Compra formal en formato JSON.
 
-El resultado debe ser estrictamente un JSON válido con esta estructura:
+El resultado debe ser estrictamente un JSON vÃ¡lido con esta estructura:
 {
-  "supplier": "Nombre del proveedor o emisor de la cotización",
-  "quoteReference": "Referencia, consecutivo, folio o código de la cotización original del proveedor (ej: COT-REF-99)",
+  "supplier": "Nombre del proveedor o emisor de la cotizaciÃ³n",
+  "quoteReference": "Referencia, consecutivo, folio o cÃ³digo de la cotizaciÃ³n original del proveedor (ej: COT-REF-99)",
   "quoteDate": "Fecha que figure en el documento del proveedor (YYYY-MM-DD)",
   "items": [
     {
-      "code": "Código del insumo o repuesto",
-      "description": "Descripción del ítem cotizado",
+      "code": "CÃ³digo del insumo o repuesto",
+      "description": "DescripciÃ³n del Ã­tem cotizado",
       "quantity": 2,
       "unitCost": 150000,
       "total": 300000
@@ -661,12 +663,12 @@ El resultado debe ser estrictamente un JSON válido con esta estructura:
 }
 
 Importante:
-- Lee fotografías y facturas tomadas con celular con precisión de caracteres.
-- Calcula los valores numéricos en pesos colombianos (COP).
+- Lee fotografÃ­as y facturas tomadas con celular con precisiÃ³n de caracteres.
+- Calcula los valores numÃ©ricos en pesos colombianos (COP).
 - Aplica el IVA del 19% sobre el subtotal si aplica.`;
 
       if (userInstruction) {
-        basePrompt += `\n\nINSTRUCCIÓN ADICIONAL DE CONTEXTO DADA POR EL USUARIO: "${userInstruction}". Aplica estrictamente estas pautas al procesar la orden de compra.`;
+        basePrompt += `\n\nINSTRUCCIÃ“N ADICIONAL DE CONTEXTO DADA POR EL USUARIO: "${userInstruction}". Aplica estrictamente estas pautas al procesar la orden de compra.`;
       }
 
       parts.push({ text: basePrompt });
@@ -713,13 +715,13 @@ Importante:
         return res.status(err.status).json({ error: err.message });
       }
       console.error("Error analyzing PO with Gemini:", err);
-      const apiKey = process.env.GEMINI_API_KEY;
+      const apiKey = GEMINI_API_KEY;
       if (apiKey) {
         return res.json({
           success: false,
           isDemo: false,
           isError: true,
-          errorMessage: "Gemini no pudo procesar el documento en este momento (saturación temporal del modelo). Inténtalo de nuevo en unos segundos."
+          errorMessage: "Gemini no pudo procesar el documento en este momento (saturaciÃ³n temporal del modelo). IntÃ©ntalo de nuevo en unos segundos."
         });
       }
       res.json({
@@ -735,7 +737,7 @@ Importante:
     try {
       await requireAuth(req);
       const { prompt, inventory, profits } = req.body;
-      const apiKey = process.env.GEMINI_API_KEY;
+      const apiKey = GEMINI_API_KEY;
       if (!apiKey) {
         return res.status(400).json({ error: "Missing GEMINI_API_KEY in environment variables." });
       }
@@ -759,12 +761,12 @@ Importante:
       };
 
       const systemInstruction = `Eres el Asesor Financiero Contable Senior del holding 'Matriz Holding Maker'.
-El holding pertenece a Rafael y Wendy, y opera en Colombia bajo normas de la DIAN y el PUC colombiano (Plan Único de Cuentas).
+El holding pertenece a Rafael y Wendy, y opera en Colombia bajo normas de la DIAN y el PUC colombiano (Plan Ãšnico de Cuentas).
 Subdivisiones:
-1. World Parts Company S.A.S. (NIT: 901.341.558-1) - Importación de autopartes (frenos, pastillas Brembo, etc.)
-2. Fundación She Maker (NIT: 901.837.241-9) - Programas sociales para mujeres. Donaciones deducibles al 25% directo del impuesto de renta (Art 257 E.T.).
-3. Raez Ingeniería S.A.S. (NIT: 901.214.568-1) - Metalmecánica y obras preventivas.
-4. Helenamar Turismo e Inmobiliaria (NIT: 900.564.123-7) - Rentas turísticas.
+1. World Parts Company S.A.S. (NIT: 901.341.558-1) - ImportaciÃ³n de autopartes (frenos, pastillas Brembo, etc.)
+2. FundaciÃ³n She Maker (NIT: 901.837.241-9) - Programas sociales para mujeres. Donaciones deducibles al 25% directo del impuesto de renta (Art 257 E.T.).
+3. Raez IngenierÃ­a S.A.S. (NIT: 901.214.568-1) - MetalmecÃ¡nica y obras preventivas.
+4. Helenamar Turismo e Inmobiliaria (NIT: 900.564.123-7) - Rentas turÃ­sticas.
 
 Analiza estos datos actuales del sistema para fundamentar tu consejo:
 - Utilidades estimadas: 
@@ -774,14 +776,14 @@ Analiza estos datos actuales del sistema para fundamentar tu consejo:
 - Resumen del inventario actual del holding:
   ${JSON.stringify(inventory || [])}
 
-Responde de forma ejecutiva, altamente analítica y empática con Wendy (Contadora) y Rafael (Administrador). Proporciona consejos contables/estratégicos sumamente útiles sobre:
-1. Recomendación de reabastecimiento internacional de Brembo e importaciones óptimas para WPC basado en stock bajo/crítico.
-2. Consejos prácticos de planeación fiscal usando la deducibilidad de donaciones de la Fundación (Art 257 ET) para reducir el impuesto neto sobre la renta.
-3. Sugerencias concretas para mantener el ledger PUC alineado con la DIAN para emisión de factura electrónica sin errores.
+Responde de forma ejecutiva, altamente analÃ­tica y empÃ¡tica con Wendy (Contadora) y Rafael (Administrador). Proporciona consejos contables/estratÃ©gicos sumamente Ãºtiles sobre:
+1. RecomendaciÃ³n de reabastecimiento internacional de Brembo e importaciones Ã³ptimas para WPC basado en stock bajo/crÃ­tico.
+2. Consejos prÃ¡cticos de planeaciÃ³n fiscal usando la deducibilidad de donaciones de la FundaciÃ³n (Art 257 ET) para reducir el impuesto neto sobre la renta.
+3. Sugerencias concretas para mantener el ledger PUC alineado con la DIAN para emisiÃ³n de factura electrÃ³nica sin errores.
 
-Mantén el estilo profesional, ordenado con viñetas, sin explicaciones técnicas del código del bot, enfocado estrictamente en resultados empresariales.`;
+MantÃ©n el estilo profesional, ordenado con viÃ±etas, sin explicaciones tÃ©cnicas del cÃ³digo del bot, enfocado estrictamente en resultados empresariales.`;
 
-      const response = await generateWithRetry(ai, prompt || "Analiza mi situación del holding actual.", {
+      const response = await generateWithRetry(ai, prompt || "Analiza mi situaciÃ³n del holding actual.", {
         systemInstruction,
         temperature: 0.7,
       });
