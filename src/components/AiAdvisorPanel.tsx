@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { apiFetch } from "../lib/api";
 import { 
   Sparkles, 
@@ -27,7 +27,7 @@ export default function AiAdvisorPanel({ inventory, commercialProfits }: AiAdvis
   const [messages, setMessages] = useState<Array<{ sender: "user" | "ai"; text: string; date: string }>>([
     {
       sender: "ai",
-      text: "Â¡Hola Rafael y Wendy! Soy su Asesor Financiero Contable Experto del Holding Matriz Maker. Estoy listo para darles recomendaciones estratÃ©gicas en tiempo real sobre el flujo de caja, la optimizaciÃ³n tributaria de donaciones (Art 257 E.T.) y el momento Ã³ptimo de compra de importaciones para World Parts Company S.A.S. Â¿En quÃ© puedo asistirlos hoy?",
+      text: "¡Hola Rafael y Wendy! Soy su Asesor Financiero Contable Experto del Holding Matriz Maker. Estoy listo para darles recomendaciones estratégicas en tiempo real sobre el flujo de caja, la optimización tributaria de donaciones (Art 257 E.T.) y el momento óptimo de compra de importaciones para World Parts Company S.A.S. ¿En qué puedo asistirlos hoy?",
       date: new Date().toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })
     }
   ]);
@@ -56,20 +56,20 @@ export default function AiAdvisorPanel({ inventory, commercialProfits }: AiAdvis
   const staticRecommendations = [
     {
       title: "Alarma de Re-abastecimiento Brembo",
-      desc: "Se detecta stock crÃ­tico en pastillas Brembo traseras (SKU: FR-BRM-045). Se sugiere emitir Orden de Compra internacional en los prÃ³ximos 5 dÃ­as para evitar ruptura de inventario. El tiempo de trÃ¡nsito estimado vÃ­a Maersk es de 25 dÃ­as.",
+      desc: "Se detecta stock crítico en pastillas Brembo traseras (SKU: FR-BRM-045). Se sugiere emitir Orden de Compra internacional en los próximos 5 días para evitar ruptura de inventario. El tiempo de tránsito estimado vía Maersk es de 25 días.",
       tag: "COMPRAS",
       color: "bg-red-50 text-red-700 border-red-100"
     },
     {
-      title: "OptimizaciÃ³n de DonaciÃ³n She Maker",
-      desc: `WPC World Parts Company proyecta una utilidad de ${new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(commercialProfits.WPC)}. Si transfieren una donaciÃ³n de ${new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(commercialProfits.WPC * 0.10)} a la FundaciÃ³n, obtendrÃ¡n un descuento tributario directo en su impuesto de renta de ${new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(commercialProfits.WPC * 0.10 * 0.25)} (Art 257 ET).`,
+      title: "Optimización de Donación She Maker",
+      desc: `WPC World Parts Company proyecta una utilidad de ${new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(commercialProfits.WPC)}. Si transfieren una donación de ${new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(commercialProfits.WPC * 0.10)} a la Fundación, obtendrán un descuento tributario directo en su impuesto de renta de ${new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(commercialProfits.WPC * 0.10 * 0.25)} (Art 257 ET).`,
       tag: "IMPUESTOS",
       color: "bg-indigo-50 text-indigo-700 border-indigo-100"
     },
     {
       title: "Estabilidad de Flujo de Caja - Raez",
-      desc: "Los contratos de ingenierÃ­a vigentes reportan un costo operativo promedio del 15% sobre el valor del servicio. Se recomienda mantener una provisiÃ³n del 10% en caja para repuestos e imprevistos de maquinaria.",
-      tag: "TESORERÃA",
+      desc: "Los contratos de ingeniería vigentes reportan un costo operativo promedio del 15% sobre el valor del servicio. Se recomienda mantener una provisión del 10% en caja para repuestos e imprevistos de maquinaria.",
+      tag: "TESORERÍA",
       color: "bg-amber-50 text-amber-700 border-amber-100"
     }
   ];
@@ -117,12 +117,12 @@ export default function AiAdvisorPanel({ inventory, commercialProfits }: AiAdvis
     } catch (err) {
       // Graceful local rule-based fallback if backend/key is unavailable
       setTimeout(() => {
-        let fallbackText = "Entendido. Como asesor experto de Matriz Maker, les recomiendo verificar que las cuentas del PUC estÃ©n completamente cuadradas antes de emitir la prÃ³xima factura electrÃ³nica DIAN. ";
+        let fallbackText = "Entendido. Como asesor experto de Matriz Maker, les recomiendo verificar que las cuentas del PUC estén completamente cuadradas antes de emitir la próxima factura electrónica DIAN. ";
         
         if (userText.toLowerCase().includes("compra") || userText.toLowerCase().includes("inventario")) {
-          fallbackText = `Para optimizar las compras de WPC Autopartes: 1. Mantener un stock mÃ­nimo de 15 unidades por SKU. 2. Consolidar importaciones Brembo trimestralmente para mitigar los sobrecostos marÃ­timos de aduana en Cartagena. Actualmente cuentan con ${inventory.filter(i => i.companyId === 'WPC').length} referencias de repuestos codificados.`;
+          fallbackText = `Para optimizar las compras de WPC Autopartes: 1. Mantener un stock mínimo de 15 unidades por SKU. 2. Consolidar importaciones Brembo trimestralmente para mitigar los sobrecostos marítimos de aduana en Cartagena. Actualmente cuentan con ${inventory.filter(i => i.companyId === 'WPC').length} referencias de repuestos codificados.`;
         } else if (userText.toLowerCase().includes("donacion") || userText.toLowerCase().includes("fundacion") || userText.toLowerCase().includes("impuesto")) {
-          fallbackText = `De acuerdo con el Estatuto Tributario Art. 257, sus donaciones a FundaciÃ³n She Maker les permiten restar de forma directa el 25% del valor donado de su impuesto neto sobre la renta. En este momento, las utilidades comerciales netas acumuladas ascienden a ${new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(commercialProfits.WPC + commercialProfits.RAEZ + commercialProfits.HELENAMAR)}, por lo que donar un 10% consolida un excelente balance social y fiscal.`;
+          fallbackText = `De acuerdo con el Estatuto Tributario Art. 257, sus donaciones a Fundación She Maker les permiten restar de forma directa el 25% del valor donado de su impuesto neto sobre la renta. En este momento, las utilidades comerciales netas acumuladas ascienden a ${new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(commercialProfits.WPC + commercialProfits.RAEZ + commercialProfits.HELENAMAR)}, por lo que donar un 10% consolida un excelente balance social y fiscal.`;
         }
 
         const aiMsg = {
@@ -150,7 +150,7 @@ export default function AiAdvisorPanel({ inventory, commercialProfits }: AiAdvis
               Senior AI Advisor & Estrategia Corporativa
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              ConsejerÃ­a estratÃ©gica para Matriz Holding Maker | Integrado con el motor de razonamiento de Google Gemini.
+              Consejería estratégica para Matriz Holding Maker | Integrado con el motor de razonamiento de Google Gemini.
             </p>
           </div>
         </div>
@@ -163,7 +163,7 @@ export default function AiAdvisorPanel({ inventory, commercialProfits }: AiAdvis
           <div className="flex items-center gap-1.5 border-b pb-2">
             <Lightbulb className="w-4 h-4 text-amber-500" />
             <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-              Alertas EstratÃ©gicas Precalculadas
+              Alertas Estratégicas Precalculadas
             </h3>
           </div>
 
@@ -227,7 +227,7 @@ export default function AiAdvisorPanel({ inventory, commercialProfits }: AiAdvis
           <form onSubmit={handleSendMessage} className="flex gap-2">
             <input
               type="text"
-              placeholder="Pregunte sobre optimizaciÃ³n tributaria, importaciones, aduanas, etc..."
+              placeholder="Pregunte sobre optimización tributaria, importaciones, aduanas, etc..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               className="flex-1 text-xs p-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"

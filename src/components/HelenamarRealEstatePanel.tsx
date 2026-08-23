@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { Property, InventoryItem, Estimate, PurchaseOrder } from "../types";
 import { apiFetch } from "../lib/api";
 import { 
@@ -112,7 +112,7 @@ export default function HelenamarRealEstatePanel({
     setMaintDescription("");
     setTargetPropIdForMaint("");
     setIsAddingNovelty(false);
-    alert(`âœ“ Novedad de '${maintType}' registrada como PENDIENTE para la propiedad.`);
+    alert(`✓ Novedad de '${maintType}' registrada como PENDIENTE para la propiedad.`);
   };
 
   const handleUploadMaintQuote = async (jobId: string, file: File) => {
@@ -131,14 +131,14 @@ export default function HelenamarRealEstatePanel({
             fileType: file.type,
             fileData: base64Data,
             companyId: "HELENAMAR",
-            userInstruction: `CotizaciÃ³n de mantenimiento y reparaciÃ³n para propiedad de Helenamar (${file.name})`
+            userInstruction: `Cotización de mantenimiento y reparación para propiedad de Helenamar (${file.name})`
           })
         });
         const data = await response.json();
 
         if (data.success && data.estimate && !data.isDemo) {
           const cost = data.estimate.total || 450000;
-          const responsible = data.estimate.customer || "Especialista HVAC / PlomerÃ­a / Acabados";
+          const responsible = data.estimate.customer || "Especialista HVAC / Plomería / Acabados";
           const desc = data.estimate.items?.[0]?.description || `Materiales y mano de obra para ${file.name}`;
           setExtractedMaintData({ cost, responsible, description: desc });
         } else {
@@ -146,14 +146,14 @@ export default function HelenamarRealEstatePanel({
           setExtractedMaintData(null);
           alert(
             data.isDemo
-              ? "âš ï¸ MODO DEMO: la API de Gemini no estÃ¡ configurada. No se puede estimar la cotizaciÃ³n de mantenimiento con datos reales."
-              : "No se pudo analizar la cotizaciÃ³n de mantenimiento. Verifique la conexiÃ³n y vuelva a intentarlo."
+              ? "⚠️ MODO DEMO: la API de Gemini no está configurada. No se puede estimar la cotización de mantenimiento con datos reales."
+              : "No se pudo analizar la cotización de mantenimiento. Verifique la conexión y vuelva a intentarlo."
           );
         }
       } catch (err) {
         console.error(err);
         setExtractedMaintData(null);
-        alert("No se pudo analizar la cotizaciÃ³n de mantenimiento. Verifique la conexiÃ³n y vuelva a intentarlo.");
+        alert("No se pudo analizar la cotización de mantenimiento. Verifique la conexión y vuelva a intentarlo.");
       } finally {
         setAnalyzingJobId(null);
         setUploadingJobId(jobId);
@@ -191,7 +191,7 @@ export default function HelenamarRealEstatePanel({
       type: "GASTO",
       amount: extractedMaintData.cost,
       customerSupplier: extractedMaintData.responsible,
-      description: `Gasto de reparaciÃ³n por novedad aprobada: ${extractedMaintData.description}`,
+      description: `Gasto de reparación por novedad aprobada: ${extractedMaintData.description}`,
       category: "Mantenimiento Propiedades",
       status: "CONTABILIZADO",
       account: "512010 - Gastos de Mantenimiento y Aseo Inmuebles",
@@ -200,7 +200,7 @@ export default function HelenamarRealEstatePanel({
 
     setUploadingJobId(null);
     setExtractedMaintData(null);
-    alert(`âœ“ CotizaciÃ³n aprobada por ${formatCOP(extractedMaintData.cost)}. Gasto imputado en el PUC en la cuenta 512010.`);
+    alert(`✓ Cotización aprobada por ${formatCOP(extractedMaintData.cost)}. Gasto imputado en el PUC en la cuenta 512010.`);
   };
 
   const handleCreateProperty = (e: React.FormEvent) => {
@@ -246,8 +246,8 @@ export default function HelenamarRealEstatePanel({
       type: "COMPRA",
       amount: val,
       customerSupplier: "Inversiones Holding Matriz",
-      description: `CapitalizaciÃ³n de patrimonio inmobiliario de Helenamar: ${newProperty.name}`,
-      category: "AdquisiciÃ³n Inmuebles (Activo)",
+      description: `Capitalización de patrimonio inmobiliario de Helenamar: ${newProperty.name}`,
+      category: "Adquisición Inmuebles (Activo)",
       status: "CONTABILIZADO",
       account: "151605 - Edificaciones e Inmuebles - Helenamar Inmobiliaria",
       companyId: "HELENAMAR"
@@ -259,7 +259,7 @@ export default function HelenamarRealEstatePanel({
     setPropValuation("");
     setPropStatus("DISPONIBLE");
     setIsCreatingProperty(false);
-    alert(`âœ“ Propiedad creada, integrada con el balance patrimonial (cuenta 151605) y agregada a Helenamar.`);
+    alert(`✓ Propiedad creada, integrada con el balance patrimonial (cuenta 151605) y agregada a Helenamar.`);
   };
 
   const handleUpdateOccupancy = (id: string, newStatus: "DISPONIBLE" | "ALQUILADO_CORTO" | "ALQUILADO_LARGO" | "MANTENIMIENTO", tenantName = "", income = 0) => {
@@ -278,7 +278,7 @@ export default function HelenamarRealEstatePanel({
         onAddTransaction({
           type: "VENTA",
           amount: income,
-          customerSupplier: tenantName || "HuÃ©sped / Arrendatario",
+          customerSupplier: tenantName || "Huésped / Arrendatario",
           description: `Ingreso por alquiler de propiedad: ${p.name} (${newStatus.replace("ALQUILADO_", "Alquiler ")})`,
           category: "Ingresos Arrendamientos Inmobiliaria",
           status: "CONTABILIZADO",
@@ -290,7 +290,7 @@ export default function HelenamarRealEstatePanel({
       return updated;
     }));
 
-    alert(`âœ“ Estado de ocupaciÃ³n actualizado. Asiento de rentas registrado en la base financiera.`);
+    alert(`✓ Estado de ocupación actualizado. Asiento de rentas registrado en la base financiera.`);
   };
 
   const handleAddCleaningLog = (e: React.FormEvent) => {
@@ -334,7 +334,7 @@ export default function HelenamarRealEstatePanel({
     setCleanCost("");
     setCleanNotes("");
     setIsAddingCleaning(false);
-    alert(`âœ“ Servicio de limpieza registrado y contabilizado en el PUC.`);
+    alert(`✓ Servicio de limpieza registrado y contabilizado en el PUC.`);
   };
 
   return (
@@ -395,11 +395,11 @@ export default function HelenamarRealEstatePanel({
                   <Wrench className="w-5 h-5" />
                 </span>
                 <h2 className="text-xl font-bold text-slate-800">
-                  MÃ³dulo de Mantenimiento de Inmuebles
+                  Módulo de Mantenimiento de Inmuebles
                 </h2>
               </div>
               <p className="text-xs text-slate-500 mt-1">
-                Reporte de novedades operativas (AC, plomerÃ­a, pintura, gas, electricidad) de Helenamar. Sube cotizaciones de reparaciÃ³n, analÃ­zalas con IA y apruÃ©balas para contabilidad automÃ¡tica.
+                Reporte de novedades operativas (AC, plomería, pintura, gas, electricidad) de Helenamar. Sube cotizaciones de reparación, analízalas con IA y apruébalas para contabilidad automática.
               </p>
             </div>
 
@@ -439,7 +439,7 @@ export default function HelenamarRealEstatePanel({
                   className="p-1.5 text-xs border rounded bg-white text-slate-800"
                 >
                   <option value="Aire Acondicionado">Aire Acondicionado</option>
-                  <option value="PlomerÃ­a">PlomerÃ­a</option>
+                  <option value="Plomería">Plomería</option>
                   <option value="Electricidad">Electricidad</option>
                   <option value="Gas">Gas</option>
                   <option value="Pintura">Pintura</option>
@@ -448,10 +448,10 @@ export default function HelenamarRealEstatePanel({
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-[10px] font-bold text-slate-500">DESCRIPCIÃ“N DE LA NOVEDAD</label>
+                <label className="text-[10px] font-bold text-slate-500">DESCRIPCIÓN DE LA NOVEDAD</label>
                 <input 
                   type="text" 
-                  placeholder="Ej: El motor del compresor del AC suena fuerte y no enfrÃ­a"
+                  placeholder="Ej: El motor del compresor del AC suena fuerte y no enfría"
                   value={maintDescription}
                   onChange={(e) => setMaintDescription(e.target.value)}
                   className="p-1.5 text-xs border rounded bg-white"
@@ -472,7 +472,7 @@ export default function HelenamarRealEstatePanel({
               <div className="col-span-1 md:col-span-2 text-center p-8 border border-dashed rounded-2xl text-slate-400">
                 <Clipboard className="w-8 h-8 mx-auto mb-2 opacity-50" />
                 <p className="text-xs font-bold">No hay novedades registradas en las propiedades</p>
-                <p className="text-[10px] text-slate-400 mt-1">Haga clic en "+ Reportar Novedad" para aÃ±adir un evento de plomerÃ­a, pintura, AC, etc.</p>
+                <p className="text-[10px] text-slate-400 mt-1">Haga clic en "+ Reportar Novedad" para añadir un evento de plomería, pintura, AC, etc.</p>
               </div>
             ) : (
               properties.flatMap(p => (p.maintenanceHistory || []).map(mh => ({ ...mh, propertyId: p.id, propertyName: p.name }))).map((job) => {
@@ -507,12 +507,12 @@ export default function HelenamarRealEstatePanel({
 
                     <div className="border-t pt-3 flex flex-col gap-2">
                       <div className="flex justify-between text-[11px] text-slate-500">
-                        <span>TÃ©cnico Responsable:</span>
+                        <span>Técnico Responsable:</span>
                         <strong className="text-slate-800">{job.responsible}</strong>
                       </div>
                       <div className="flex justify-between text-[11px] text-slate-500">
-                        <span>Costo de ReparaciÃ³n:</span>
-                        <strong className="text-slate-800 font-mono">{job.cost > 0 ? formatCOP(job.cost) : "CotizaciÃ³n Pendiente"}</strong>
+                        <span>Costo de Reparación:</span>
+                        <strong className="text-slate-800 font-mono">{job.cost > 0 ? formatCOP(job.cost) : "Cotización Pendiente"}</strong>
                       </div>
                     </div>
 
@@ -521,17 +521,17 @@ export default function HelenamarRealEstatePanel({
                       <div className="mt-2 flex flex-col gap-3">
                         {analyzingJobId === job.id ? (
                           <div className="p-4 bg-sky-50 rounded-xl border border-sky-100 flex items-center justify-center gap-2 text-xs text-sky-700 font-bold">
-                            <Sparkles className="w-4 h-4 text-sky-500 animate-spin" /> Analizando cotizaciÃ³n tÃ©cnica con IA...
+                            <Sparkles className="w-4 h-4 text-sky-500 animate-spin" /> Analizando cotización técnica con IA...
                           </div>
                         ) : uploadingJobId === job.id && extractedMaintData ? (
                           <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100 flex flex-col gap-2.5 animate-fadeIn">
                             <h5 className="text-[10px] font-bold text-emerald-950 uppercase tracking-wide flex items-center gap-1">
-                              <Sparkles className="w-3.5 h-3.5" /> CotizaciÃ³n Analizada por Gemini
+                              <Sparkles className="w-3.5 h-3.5" /> Cotización Analizada por Gemini
                             </h5>
                             <div className="text-xs text-slate-700 flex flex-col gap-1">
-                              <p>ðŸ·ï¸ <strong>Proveedor:</strong> {extractedMaintData.responsible}</p>
-                              <p>ðŸ’° <strong>Valor Cotizado:</strong> <span className="font-mono font-bold text-emerald-700">{formatCOP(extractedMaintData.cost)}</span></p>
-                              <p>ðŸ“ <strong>Concepto:</strong> {extractedMaintData.description}</p>
+                              <p>🏷️ <strong>Proveedor:</strong> {extractedMaintData.responsible}</p>
+                              <p>💰 <strong>Valor Cotizado:</strong> <span className="font-mono font-bold text-emerald-700">{formatCOP(extractedMaintData.cost)}</span></p>
+                              <p>📝 <strong>Concepto:</strong> {extractedMaintData.description}</p>
                             </div>
                             <div className="flex gap-2 justify-end mt-1">
                               <button
@@ -564,8 +564,8 @@ export default function HelenamarRealEstatePanel({
                             />
                             <label htmlFor={`upload-quote-${job.id}`} className="cursor-pointer flex flex-col items-center gap-1">
                               <Upload className="w-4 h-4 text-slate-400" />
-                              <span className="text-[10px] font-bold text-slate-600">Adjuntar Foto / CotizaciÃ³n de ReparaciÃ³n</span>
-                              <span className="text-[8px] text-slate-400">FotografÃ­a de celular, imagen, PDF o Excel analizado inmediatamente</span>
+                              <span className="text-[10px] font-bold text-slate-600">Adjuntar Foto / Cotización de Reparación</span>
+                              <span className="text-[8px] text-slate-400">Fotografía de celular, imagen, PDF o Excel analizado inmediatamente</span>
                             </label>
                           </div>
                         )}
@@ -587,11 +587,11 @@ export default function HelenamarRealEstatePanel({
               <Building2 className="w-5 h-5" />
             </span>
             <h2 className="text-xl font-bold text-slate-800">
-              MÃ³dulo de Propiedades y Turismo (Helenamar)
+              Módulo de Propiedades y Turismo (Helenamar)
             </h2>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Helenamar Turismo e Inmobiliaria | Control de ocupaciÃ³n y tarifas de propiedades turÃ­sticas, bitÃ¡coras de aseo/limpieza profunda y patrimonio inmueble.
+            Helenamar Turismo e Inmobiliaria | Control de ocupación y tarifas de propiedades turísticas, bitácoras de aseo/limpieza profunda y patrimonio inmueble.
           </p>
         </div>
 
@@ -618,7 +618,7 @@ export default function HelenamarRealEstatePanel({
         <div className="lg:col-span-2 flex flex-col gap-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b pb-2">
             <h3 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-              <Home className="w-4 h-4 text-emerald-500" /> Control de OcupaciÃ³n e Inmuebles del Holding
+              <Home className="w-4 h-4 text-emerald-500" /> Control de Ocupación e Inmuebles del Holding
             </h3>
             {/* Global Maintenance Costs Card */}
             <div className="bg-emerald-50/70 border border-emerald-100 px-3 py-1 rounded-lg flex items-center gap-2">
@@ -638,7 +638,7 @@ export default function HelenamarRealEstatePanel({
           {/* Form Property */}
           {isCreatingProperty && (
             <form onSubmit={handleCreateProperty} className="p-4 bg-emerald-50/50 border border-emerald-100 rounded-xl grid grid-cols-1 md:grid-cols-2 gap-3 animate-fadeIn">
-              <h4 className="col-span-1 md:col-span-2 text-xs font-bold text-emerald-900 uppercase">AÃ±adir Propiedad Inmobiliaria al Patrimonio</h4>
+              <h4 className="col-span-1 md:col-span-2 text-xs font-bold text-emerald-900 uppercase">Añadir Propiedad Inmobiliaria al Patrimonio</h4>
               
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold text-slate-500">NOMBRE DE LA PROPIEDAD</label>
@@ -653,7 +653,7 @@ export default function HelenamarRealEstatePanel({
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-[10px] font-bold text-slate-500">DIRECCIÃ“N Y CIUDAD</label>
+                <label className="text-[10px] font-bold text-slate-500">DIRECCIÓN Y CIUDAD</label>
                 <input 
                   type="text" 
                   placeholder="Ej: Calle 8 # 3-21, Santa Marta"
@@ -665,7 +665,7 @@ export default function HelenamarRealEstatePanel({
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-[10px] font-bold text-slate-500">VALUACIÃ“N COMERCIAL PATRIMONIAL (COP)</label>
+                <label className="text-[10px] font-bold text-slate-500">VALUACIÓN COMERCIAL PATRIMONIAL (COP)</label>
                 <input 
                   type="number" 
                   placeholder="Ej: 420000000"
@@ -750,7 +750,7 @@ export default function HelenamarRealEstatePanel({
                         }}
                         className="w-full flex items-center justify-between px-2 py-1 bg-white hover:bg-slate-100 border border-slate-200/60 rounded text-[10px] text-slate-600 font-extrabold cursor-pointer transition-all"
                       >
-                        <span>ðŸ“‹ HistÃ³rico Mantenimiento ({prop.maintenanceHistory?.length || 0})</span>
+                        <span>📋 Histórico Mantenimiento ({prop.maintenanceHistory?.length || 0})</span>
                         <span className="text-[9px] text-slate-400">{isExpanded ? "â–² Ocultar" : "â–¼ Ver Detalle"}</span>
                       </button>
 
@@ -802,7 +802,7 @@ export default function HelenamarRealEstatePanel({
                       </button>
                       <button
                         onClick={() => {
-                          const guest = prompt("Ingrese nombre del huÃ©sped de turismo:");
+                          const guest = prompt("Ingrese nombre del huésped de turismo:");
                           const fee = parseFloat(prompt("Ingrese valor total de la reserva (COP):") || "0");
                           if (guest && fee > 0) {
                             handleUpdateOccupancy(prop.id, "ALQUILADO_CORTO", guest, fee);
@@ -884,7 +884,7 @@ export default function HelenamarRealEstatePanel({
                 <label className="text-[9px] font-bold text-slate-400">NOTAS</label>
                 <input 
                   type="text" 
-                  placeholder="Ej: Cambio de sÃ¡banas completo, lavado de vidrios."
+                  placeholder="Ej: Cambio de sábanas completo, lavado de vidrios."
                   value={cleanNotes}
                   onChange={(e) => setCleanNotes(e.target.value)}
                   className="p-1 text-xs border rounded bg-white"
@@ -916,7 +916,7 @@ export default function HelenamarRealEstatePanel({
           <div className="bg-amber-50/70 p-3 border border-amber-100 rounded-xl flex items-start gap-2 text-[10px] text-amber-800 leading-relaxed">
             <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
             <p>
-              <strong>Rentabilidad de Helenamar:</strong> Cada limpieza registrada reporta contablemente un gasto debitado en la cuenta <strong>512010 (Mantenimiento y Aseo)</strong>. Del mismo modo, registrar alquileres turÃ­sticos alimenta en tiempo real la facturaciÃ³n neta de la cuenta <strong>415005 (Arrendamientos)</strong>.
+              <strong>Rentabilidad de Helenamar:</strong> Cada limpieza registrada reporta contablemente un gasto debitado en la cuenta <strong>512010 (Mantenimiento y Aseo)</strong>. Del mismo modo, registrar alquileres turísticos alimenta en tiempo real la facturación neta de la cuenta <strong>415005 (Arrendamientos)</strong>.
             </p>
           </div>
         </div>

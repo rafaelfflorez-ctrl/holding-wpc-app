@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { jsPDF } from "jspdf";
 import { 
   Estimate, 
@@ -116,23 +116,23 @@ export default function CommercialProcurementHub({
       extractedTitle: "Montaje de Viga H Soldada",
       customerName: "Aceros del Norte SAS",
       valueQuoted: 14500000,
-      timeEstimated: "12 dÃ­as hÃ¡biles",
-      profitabilityAnalysis: "Margen operativo neto de 32% sobre costos directos de fundiciÃ³n y electrodos.",
-      overcosts: "Sensible a fluctuaciÃ³n del precio de acero laminado (+12% proyectado para Q3).",
-      imprevistos: "Reserva tÃ©cnica recomendada del 8% por demoras logÃ­sticas en transporte pesado de grÃºa."
+      timeEstimated: "12 días hábiles",
+      profitabilityAnalysis: "Margen operativo neto de 32% sobre costos directos de fundición y electrodos.",
+      overcosts: "Sensible a fluctuación del precio de acero laminado (+12% proyectado para Q3).",
+      imprevistos: "Reserva técnica recomendada del 8% por demoras logísticas en transporte pesado de grúa."
     },
     {
       id: "LRN-002",
       fileName: "Quote_Brembo_Carbon_Ceramic_WPC.xlsx",
       date: "2026-07-18",
       companyId: "WPC",
-      extractedTitle: "ImportaciÃ³n Brembo Carbon Ceramic",
+      extractedTitle: "Importación Brembo Carbon Ceramic",
       customerName: "Taller Automotriz Los Coches",
       valueQuoted: 42000000,
-      timeEstimated: "25 dÃ­as de trÃ¡nsito aÃ©reo",
-      profitabilityAnalysis: "Utilidad alta de 48% debido a exclusividad de distribuciÃ³n directa Brembo.",
-      overcosts: "Riesgo cambiario TRM alto. Incremento de aranceles de importaciÃ³n de la DIAN.",
-      imprevistos: "Proveer contingencia del 10% por inspecciÃ³n fÃ­sica de aduanas en el Puerto de Cartagena."
+      timeEstimated: "25 días de tránsito aéreo",
+      profitabilityAnalysis: "Utilidad alta de 48% debido a exclusividad de distribución directa Brembo.",
+      overcosts: "Riesgo cambiario TRM alto. Incremento de aranceles de importación de la DIAN.",
+      imprevistos: "Proveer contingencia del 10% por inspección física de aduanas en el Puerto de Cartagena."
     }
   ]);
 
@@ -163,10 +163,10 @@ export default function CommercialProcurementHub({
           button: "bg-pink-600 hover:bg-pink-700",
           badgeLetter: "F",
           nit: "901.837.241-9",
-          address: "Calle 45 # 13-10, BogotÃ¡ D.C., Colombia",
+          address: "Calle 45 # 13-10, Bogotá D.C., Colombia",
           phone: "Tel: +57 (601) 321-7492",
           email: "contacto@shemaker.org",
-          moto: "Empoderando mujeres mediante la tecnologÃ­a, hardware y cÃ³digo"
+          moto: "Empoderando mujeres mediante la tecnología, hardware y código"
         };
       case "RAEZ":
         return {
@@ -177,10 +177,10 @@ export default function CommercialProcurementHub({
           button: "bg-amber-600 hover:bg-amber-700",
           badgeLetter: "R",
           nit: "901.214.568-1",
-          address: "Zona Industrial Puente Aranda, BogotÃ¡ D.C., Colombia",
+          address: "Zona Industrial Puente Aranda, Bogotá D.C., Colombia",
           phone: "Tel: +57 (601) 752-1920",
           email: "proyectos@raez.co",
-          moto: "IngenierÃ­a de precisiÃ³n, mecanizados de alta tolerancia y soldadura"
+          moto: "Ingeniería de precisión, mecanizados de alta tolerancia y soldadura"
         };
       case "HELENAMAR":
         return {
@@ -279,7 +279,7 @@ export default function CommercialProcurementHub({
   const handleSaveManualQuote = (e: React.FormEvent) => {
     e.preventDefault();
     if (!quoteCustomer || quoteItems.some(item => !item.desc || item.price <= 0)) {
-      alert("Por favor complete todos los datos de los Ã­tems de la cotizaciÃ³n");
+      alert("Por favor complete todos los datos de los ítems de la cotización");
       return;
     }
 
@@ -339,7 +339,7 @@ export default function CommercialProcurementHub({
     setEstimates(prev => [newEstimate, ...prev]);
     setIsCreatingQuote(false);
     resetQuoteForm();
-    alert(`âœ“ CotizaciÃ³n ${newEstimate.id} creada para ${newEstimate.customer} (Utilidad estimada: ${formatCOP(totalProfit)} COP).`);
+    alert(`✓ Cotización ${newEstimate.id} creada para ${newEstimate.customer} (Utilidad estimada: ${formatCOP(totalProfit)} COP).`);
   };
 
   const resetQuoteForm = () => {
@@ -535,14 +535,14 @@ export default function CommercialProcurementHub({
       type: "COMPRA",
       amount: total,
       customerSupplier: newPO.supplier,
-      description: `Orden de Compra emitida ${newPO.id}: AdquisiciÃ³n de materiales/suministros`,
-      category: "AdquisiciÃ³n Materiales",
+      description: `Orden de Compra emitida ${newPO.id}: Adquisición de materiales/suministros`,
+      category: "Adquisición Materiales",
       status: "BORRADOR",
       account: "220505 - Proveedores Nacionales",
       companyId
     });
 
-    alert(`âœ“ Orden de Compra ${newPO.id} emitida a ${newPO.supplier}.`);
+    alert(`✓ Orden de Compra ${newPO.id} emitida a ${newPO.supplier}.`);
   };
 
   const resetPoForm = () => {
@@ -594,7 +594,7 @@ export default function CommercialProcurementHub({
 
         const data = await response.json();
 
-        // Error real del modelo (saturaciÃ³n/red): avisar sin inventar datos.
+        // Error real del modelo (saturación/red): avisar sin inventar datos.
         if (data.isError) {
           setIsAnalyzing(false);
           setAnalyzingFilePreview(null);
@@ -608,15 +608,15 @@ export default function CommercialProcurementHub({
         // MODO DEMO: sin GEMINI_API_KEY el servidor devuelve datos simulados.
         if (data.isDemo) {
           const proceed = window.confirm(
-            "âš ï¸ MODO DEMO: la API de Gemini no estÃ¡ configurada en el servidor. Se generarÃ¡ una cotizaciÃ³n con datos SIMULADOS para previsualizar el flujo, pero NO reflejarÃ¡ el contenido real del documento. Â¿Desea incluirla?"
+            "⚠️ MODO DEMO: la API de Gemini no está configurada en el servidor. Se generará una cotización con datos SIMULADOS para previsualizar el flujo, pero NO reflejará el contenido real del documento. ¿Desea incluirla?"
           );
           if (!proceed) {
             setIsAnalyzing(false);
             setAnalyzingFilePreview(null);
-            setAnalysisError("ExtracciÃ³n cancelada. Configure GEMINI_API_KEY en los secrets del proyecto para el procesamiento real del documento.");
+            setAnalysisError("Extracción cancelada. Configure GEMINI_API_KEY en los secrets del proyecto para el procesamiento real del documento.");
             return;
           }
-          extractedEstimate.notes = [extractedEstimate.notes, "âš  SIMULACIÃ“N (sin GEMINI_API_KEY)"].filter(Boolean).join(" | ");
+          extractedEstimate.notes = [extractedEstimate.notes, "⚠ SIMULACIÓN (sin GEMINI_API_KEY)"].filter(Boolean).join(" | ");
         }
 
         if (!extractedEstimate.id || !extractedEstimate.id.startsWith("COT-")) {
@@ -634,7 +634,7 @@ export default function CommercialProcurementHub({
           customerName: extractedEstimate.customer,
           valueQuoted: extractedEstimate.total,
           timeEstimated: data.learning?.tiempoEstimadoEjecucion || "No especificado",
-          profitabilityAnalysis: data.learning?.viabilidadUtilidad || "Margen Ã³ptimo.",
+          profitabilityAnalysis: data.learning?.viabilidadUtilidad || "Margen óptimo.",
           overcosts: data.learning?.sobrecostos || "Bajo riesgo de sobrecosto.",
           imprevistos: data.learning?.imprevistos || "Se aconseja un 5% de imprevistos."
         };
@@ -642,13 +642,13 @@ export default function CommercialProcurementHub({
         setLearningDb(prev => [newLearning, ...prev]);
         setIsAnalyzing(false);
         setAnalyzingFilePreview(null);
-        alert(`âœ“ IA analizÃ³ con Ã©xito la ${isImg ? "fotografÃ­a/imagen" : "cotizaciÃ³n"} "${file.name}". Extrajo la cotizaciÃ³n ${extractedEstimate.id} con cÃ¡lculo de utilidad.`);
+        alert(`✓ IA analizó con éxito la ${isImg ? "fotografía/imagen" : "cotización"} "${file.name}". Extrajo la cotización ${extractedEstimate.id} con cálculo de utilidad.`);
 
       } catch (err: any) {
         console.error(err);
         setIsAnalyzing(false);
         setAnalyzingFilePreview(null);
-        setAnalysisError("No se pudo analizar el archivo (servidor o API de Gemini no disponible). No se generaron datos automÃ¡ticos. Verifique que GEMINI_API_KEY estÃ© configurada y vuelva a intentarlo.");
+        setAnalysisError("No se pudo analizar el archivo (servidor o API de Gemini no disponible). No se generaron datos automáticos. Verifique que GEMINI_API_KEY esté configurada y vuelva a intentarlo.");
       }
     };
 
@@ -705,7 +705,7 @@ export default function CommercialProcurementHub({
 
         const data = await response.json();
 
-        // Error real del modelo (saturaciÃ³n/red): avisar sin inventar datos.
+        // Error real del modelo (saturación/red): avisar sin inventar datos.
         if (data.isError) {
           setIsAnalyzing(false);
           setAnalyzingFilePreview(null);
@@ -719,15 +719,15 @@ export default function CommercialProcurementHub({
         // MODO DEMO: sin GEMINI_API_KEY el servidor devuelve datos simulados.
         if (data.isDemo) {
           const proceed = window.confirm(
-            "âš ï¸ MODO DEMO: la API de Gemini no estÃ¡ configurada en el servidor. Se generarÃ¡ una orden de compra con datos SIMULADOS para previsualizar el flujo, pero NO reflejarÃ¡ el contenido real del documento. Â¿Desea incluirla?"
+            "⚠️ MODO DEMO: la API de Gemini no está configurada en el servidor. Se generará una orden de compra con datos SIMULADOS para previsualizar el flujo, pero NO reflejará el contenido real del documento. ¿Desea incluirla?"
           );
           if (!proceed) {
             setIsAnalyzing(false);
             setAnalyzingFilePreview(null);
-            setAnalysisError("ExtracciÃ³n cancelada. Configure GEMINI_API_KEY en los secrets del proyecto para el procesamiento real del documento.");
+            setAnalysisError("Extracción cancelada. Configure GEMINI_API_KEY en los secrets del proyecto para el procesamiento real del documento.");
             return;
           }
-          extractedPO.notes = [extractedPO.notes, "âš  SIMULACIÃ“N (sin GEMINI_API_KEY)"].filter(Boolean).join(" | ");
+          extractedPO.notes = [extractedPO.notes, "⚠ SIMULACIÓN (sin GEMINI_API_KEY)"].filter(Boolean).join(" | ");
         }
 
         extractedPO.id = generateNextODCId(companyId);
@@ -738,8 +738,8 @@ export default function CommercialProcurementHub({
           type: "COMPRA",
           amount: extractedPO.total,
           customerSupplier: extractedPO.supplier,
-          description: `Orden de Compra extraÃ­da por IA ${extractedPO.id} para ${extractedPO.supplier}`,
-          category: "AdquisiciÃ³n Insumos IA",
+          description: `Orden de Compra extraída por IA ${extractedPO.id} para ${extractedPO.supplier}`,
+          category: "Adquisición Insumos IA",
           status: "CONTABILIZADO",
           account: "220505 - Proveedores Nacionales",
           companyId
@@ -747,13 +747,13 @@ export default function CommercialProcurementHub({
 
         setIsAnalyzing(false);
         setAnalyzingFilePreview(null);
-        alert(`âœ“ IA procesÃ³ con Ã©xito la ${isImg ? "fotografÃ­a/factura" : "cotizaciÃ³n"} "${file.name}". Orden de compra ${extractedPO.id} generada y contabilizada.`);
+        alert(`✓ IA procesó con éxito la ${isImg ? "fotografía/factura" : "cotización"} "${file.name}". Orden de compra ${extractedPO.id} generada y contabilizada.`);
 
       } catch (err: any) {
         console.error(err);
         setIsAnalyzing(false);
         setAnalyzingFilePreview(null);
-        setAnalysisError("No se pudo analizar el archivo (servidor o API de Gemini no disponible). No se generaron datos automÃ¡ticos. Verifique que GEMINI_API_KEY estÃ© configurada y vuelva a intentarlo.");
+        setAnalysisError("No se pudo analizar el archivo (servidor o API de Gemini no disponible). No se generaron datos automáticos. Verifique que GEMINI_API_KEY esté configurada y vuelva a intentarlo.");
       }
     };
 
@@ -863,7 +863,7 @@ export default function CommercialProcurementHub({
     doc.setTextColor(b.color[0], b.color[1], b.color[2]);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13);
-    doc.text("COTIZACIÃ“N COMERCIAL", 20, 48);
+    doc.text("COTIZACIÓN COMERCIAL", 20, 48);
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
@@ -873,7 +873,7 @@ export default function CommercialProcurementHub({
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
     doc.setTextColor(100, 116, 139);
-    doc.text(`Fecha EmisiÃ³n: ${cot.date}   |   VÃ¡lido Hasta: ${cot.validUntil}`, 190, 50, { align: "right" });
+    doc.text(`Fecha Emisión: ${cot.date}   |   Válido Hasta: ${cot.validUntil}`, 190, 50, { align: "right" });
 
     // --- Client Metadata ---
     const clientY = 58;
@@ -883,14 +883,14 @@ export default function CommercialProcurementHub({
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8.5);
     doc.setTextColor(b.color[0], b.color[1], b.color[2]);
-    doc.text("INFORMACIÃ“N DESTINATARIO (CLIENTE)", 20, clientY + 6);
+    doc.text("INFORMACIÓN DESTINATARIO (CLIENTE)", 20, clientY + 6);
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8);
     doc.setTextColor(30, 41, 59);
     doc.text("Nombre / Cliente:", 20, clientY + 13);
-    doc.text("NIT / CÃ©dula:", 20, clientY + 19);
-    doc.text("DirecciÃ³n:", 20, clientY + 25);
+    doc.text("NIT / Cédula:", 20, clientY + 19);
+    doc.text("Dirección:", 20, clientY + 25);
 
     doc.setFont("helvetica", "normal");
     doc.text(cot.customer, 48, clientY + 13);
@@ -898,7 +898,7 @@ export default function CommercialProcurementHub({
     doc.text(cot.customerAddress || "No registrada", 48, clientY + 25);
 
     doc.setFont("helvetica", "bold");
-    doc.text("TelÃ©fono:", 115, clientY + 13);
+    doc.text("Teléfono:", 115, clientY + 13);
     doc.text("Correo Elec.:", 115, clientY + 19);
     
     doc.setFont("helvetica", "normal");
@@ -913,8 +913,8 @@ export default function CommercialProcurementHub({
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8.5);
     doc.setTextColor(255, 255, 255);
-    doc.text("CÃ“DIGO", 18, tableHeaderY + 5);
-    doc.text("DESCRIPCIÃ“N DEL ARTÃCULO / SERVICIO", 42, tableHeaderY + 5);
+    doc.text("CÓDIGO", 18, tableHeaderY + 5);
+    doc.text("DESCRIPCIÓN DEL ARTÍCULO / SERVICIO", 42, tableHeaderY + 5);
     doc.text("CANT.", 130, tableHeaderY + 5, { align: "right" });
     doc.text("VALOR UNIT. (COP)", 160, tableHeaderY + 5, { align: "right" });
     doc.text("TOTAL (COP)", 192, tableHeaderY + 5, { align: "right" });
@@ -928,7 +928,7 @@ export default function CommercialProcurementHub({
       const splitDesc = doc.splitTextToSize(item.description, 83);
       const rowHeight = Math.max(8, splitDesc.length * 4 + 3);
 
-      // PaginaciÃ³n: si la fila excede el pie de pÃ¡gina, nueva hoja con encabezado repetido.
+      // Paginación: si la fila excede el pie de página, nueva hoja con encabezado repetido.
       if (currentY + rowHeight > 272) {
         doc.addPage();
         currentY = 20;
@@ -937,8 +937,8 @@ export default function CommercialProcurementHub({
         doc.setFont("helvetica", "bold");
         doc.setFontSize(8.5);
         doc.setTextColor(255, 255, 255);
-        doc.text("CÃ“DIGO", 18, currentY + 5);
-        doc.text("DESCRIPCIÃ“N DEL ARTÃCULO / SERVICIO", 42, currentY + 5);
+        doc.text("CÓDIGO", 18, currentY + 5);
+        doc.text("DESCRIPCIÓN DEL ARTÍCULO / SERVICIO", 42, currentY + 5);
         doc.text("CANT.", 130, currentY + 5, { align: "right" });
         doc.text("VALOR UNIT. (COP)", 160, currentY + 5, { align: "right" });
         doc.text("TOTAL (COP)", 192, currentY + 5, { align: "right" });
@@ -970,7 +970,7 @@ export default function CommercialProcurementHub({
       currentY += rowHeight;
     });
 
-    // Asegurar espacio para totales + pie de pÃ¡gina.
+    // Asegurar espacio para totales + pie de página.
     if (currentY > 230) {
       doc.addPage();
       currentY = 20;
@@ -1016,7 +1016,7 @@ export default function CommercialProcurementHub({
     doc.setFont("helvetica", "normal");
     doc.setFontSize(7.5);
     doc.setTextColor(100, 116, 139);
-    const notesText = cot.notes || "Validez de la oferta por 30 dÃ­as calendario a partir de la fecha de emisiÃ³n. Los precios NO incluyen el impuesto al valor agregado (IVA); el IVA del 19% se suma sobre el subtotal. Despacho sujeto a disponibilidad de stock en el inventario real de la subdivisiÃ³n del holding.";
+    const notesText = cot.notes || "Validez de la oferta por 30 días calendario a partir de la fecha de emisión. Los precios NO incluyen el impuesto al valor agregado (IVA); el IVA del 19% se suma sobre el subtotal. Despacho sujeto a disponibilidad de stock en el inventario real de la subdivisión del holding.";
     const splitNotes = doc.splitTextToSize(notesText, 174);
     doc.text(splitNotes, 18, footerY + 10);
 
@@ -1104,7 +1104,7 @@ export default function CommercialProcurementHub({
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
     doc.setTextColor(100, 116, 139);
-    doc.text(`Fecha EmisiÃ³n: ${po.date}   |   Estatus: ${po.status}`, 190, 50, { align: "right" });
+    doc.text(`Fecha Emisión: ${po.date}   |   Estatus: ${po.status}`, 190, 50, { align: "right" });
 
     // --- Supplier Metadata ---
     const clientY = 58;
@@ -1119,23 +1119,23 @@ export default function CommercialProcurementHub({
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8);
     doc.setTextColor(30, 41, 59);
-    doc.text("Proveedor / RazÃ³n Social:", 20, clientY + 13);
+    doc.text("Proveedor / Razón Social:", 20, clientY + 13);
     doc.text("Transportadora:", 20, clientY + 19);
-    doc.text("CondiciÃ³n Pago:", 20, clientY + 25);
+    doc.text("Condición Pago:", 20, clientY + 25);
 
     doc.setFont("helvetica", "normal");
     doc.text(po.supplier, 56, clientY + 13);
-    doc.text(po.carrier || "EnvÃ­os directos", 56, clientY + 19);
-    doc.text("Pago posterior a recepciÃ³n factura (30 dÃ­as)", 56, clientY + 25);
+    doc.text(po.carrier || "Envíos directos", 56, clientY + 19);
+    doc.text("Pago posterior a recepción factura (30 días)", 56, clientY + 25);
 
     doc.setFont("helvetica", "bold");
     doc.text("E.T.A. llegada:", 115, clientY + 13);
     doc.text("Destino Despacho:", 115, clientY + 19);
     
     doc.setFont("helvetica", "normal");
-    doc.text(po.etaDate || "7 dÃ­as hÃ¡biles", 142, clientY + 13);
+    doc.text(po.etaDate || "7 días hábiles", 142, clientY + 13);
 
-    const fullDispatchAddress = `Edificio Torres BahÃ­a I y II Apt 402, ${b.address}`;
+    const fullDispatchAddress = `Edificio Torres Bahía I y II Apt 402, ${b.address}`;
     const splitDispatch = doc.splitTextToSize(fullDispatchAddress, 50);
     doc.text(splitDispatch, 142, clientY + 19);
 
@@ -1147,7 +1147,7 @@ export default function CommercialProcurementHub({
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8.5);
     doc.setTextColor(255, 255, 255);
-    doc.text("CÃ“DIGO", 18, tableHeaderY + 5);
+    doc.text("CÓDIGO", 18, tableHeaderY + 5);
     doc.text("INSUMO / REPUESTO / SERVICIO SOLICITADO", 42, tableHeaderY + 5);
     doc.text("CANTIDAD", 130, tableHeaderY + 5, { align: "right" });
     doc.text("COSTO UNIT. (COP)", 160, tableHeaderY + 5, { align: "right" });
@@ -1162,7 +1162,7 @@ export default function CommercialProcurementHub({
       const splitDesc = doc.splitTextToSize(item.description, 83);
       const rowHeight = Math.max(8, splitDesc.length * 4 + 3);
 
-      // PaginaciÃ³n: si la fila excede el pie de pÃ¡gina, nueva hoja con encabezado repetido.
+      // Paginación: si la fila excede el pie de página, nueva hoja con encabezado repetido.
       if (currentY + rowHeight > 272) {
         doc.addPage();
         currentY = 20;
@@ -1171,7 +1171,7 @@ export default function CommercialProcurementHub({
         doc.setFont("helvetica", "bold");
         doc.setFontSize(8.5);
         doc.setTextColor(255, 255, 255);
-        doc.text("CÃ“DIGO", 18, currentY + 5);
+        doc.text("CÓDIGO", 18, currentY + 5);
         doc.text("INSUMO / REPUESTO / SERVICIO SOLICITADO", 42, currentY + 5);
         doc.text("CANTIDAD", 130, currentY + 5, { align: "right" });
         doc.text("COSTO UNIT. (COP)", 160, currentY + 5, { align: "right" });
@@ -1204,7 +1204,7 @@ export default function CommercialProcurementHub({
       currentY += rowHeight;
     });
 
-    // Asegurar espacio para totales + pie de pÃ¡gina.
+    // Asegurar espacio para totales + pie de página.
     if (currentY > 230) {
       doc.addPage();
       currentY = 20;
@@ -1256,12 +1256,12 @@ export default function CommercialProcurementHub({
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8);
     doc.setTextColor(71, 85, 105);
-    doc.text("Condiciones de Suministro y FacturaciÃ³n:", 18, footerY + 5);
+    doc.text("Condiciones de Suministro y Facturación:", 18, footerY + 5);
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(7.5);
     doc.setTextColor(100, 116, 139);
-    const notesText = po.notes || "Se requiere facturaciÃ³n electrÃ³nica con el NIT de la empresa holding emisor en un plazo no mayor a 5 dÃ­as hÃ¡biles posterior a la entrega. Los productos deben coincidir de forma idÃ©ntica con los cÃ³digos descritos. No se admiten sustitutos sin aprobaciÃ³n escrita del revisor.";
+    const notesText = po.notes || "Se requiere facturación electrónica con el NIT de la empresa holding emisor en un plazo no mayor a 5 días hábiles posterior a la entrega. Los productos deben coincidir de forma idéntica con los códigos descritos. No se admiten sustitutos sin aprobación escrita del revisor.";
     const splitNotes = doc.splitTextToSize(notesText, 174);
     doc.text(splitNotes, 18, footerY + 10);
 
@@ -1273,19 +1273,19 @@ export default function CommercialProcurementHub({
     if (po.status === "RECIBIDO") return;
     setPurchaseOrders(prev => prev.map(p => p.id === po.id ? { ...p, status: "RECIBIDO" } : p));
     const account = companyId === "WPC"
-      ? "143501 - MercancÃ­as de ImportaciÃ³n - WPC Autopartes"
+      ? "143501 - Mercancías de Importación - WPC Autopartes"
       : "220505 - Proveedores Nacionales";
     onAddTransaction({
       type: "COMPRA",
       amount: po.total,
       customerSupplier: po.supplier,
       description: `Compra registrada al recibir la O.C. ${po.id}`,
-      category: "AdquisiciÃ³n Recibida",
+      category: "Adquisición Recibida",
       status: "CONTABILIZADO",
       account,
       companyId
     });
-    alert(`âœ“ O.C. ${po.id} marcada como RECIBIDA y contabilizada en compras.`);
+    alert(`✓ O.C. ${po.id} marcada como RECIBIDA y contabilizada en compras.`);
   };
 
   return (
@@ -1311,7 +1311,7 @@ export default function CommercialProcurementHub({
               : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
           }`}
         >
-          <ClipboardList className="w-4 h-4" /> Ã“rdenes de Compra (Proveedores)
+          <ClipboardList className="w-4 h-4" /> Órdenes de Compra (Proveedores)
         </button>
         <button
           onClick={() => setActiveSubTab("APRENDIZAJE")}
@@ -1334,7 +1334,7 @@ export default function CommercialProcurementHub({
             <Sparkles className={`w-8 h-8 animate-spin ${brand.text}`} />
             <div>
               <p className="text-xs font-bold text-slate-700">Analizando Documento con Google Gemini 3.7-Flash...</p>
-              <p className="text-[10px] text-slate-400 mt-1">Extrayendo Ã­tems, cÃ³digos, precios y generando insights contables preventivos.</p>
+              <p className="text-[10px] text-slate-400 mt-1">Extrayendo ítems, códigos, precios y generando insights contables preventivos.</p>
             </div>
           </div>
         )}
@@ -1349,7 +1349,7 @@ export default function CommercialProcurementHub({
               <div className="relative w-28 h-28 rounded-xl overflow-hidden border-2 border-indigo-400/50 bg-black/40 shrink-0 shadow-md">
                 <img 
                   src={analyzingFilePreview.previewUrl} 
-                  alt="Vista previa fotografÃ­a" 
+                  alt="Vista previa fotografía" 
                   className="w-full h-full object-cover" 
                 />
                 {/* Laser scanline animation */}
@@ -1368,14 +1368,14 @@ export default function CommercialProcurementHub({
               <div className="flex items-center justify-center md:justify-start gap-2">
                 <Loader2 className="w-4 h-4 text-cyan-300 animate-spin" />
                 <span className="text-xs font-extrabold text-cyan-300 uppercase tracking-wide">
-                  {analyzingFilePreview?.isImage ? "ðŸ“¸ Analizando FotografÃ­a / Imagen con Gemini Vision OCR" : "ðŸ“„ Procesando Documento con IA"}
+                  {analyzingFilePreview?.isImage ? "📸 Analizando Fotografía / Imagen con Gemini Vision OCR" : "📄 Procesando Documento con IA"}
                 </span>
               </div>
               <p className="text-sm font-bold text-white truncate max-w-md">
                 {analyzingFilePreview?.name || "Leyendo archivo..."}
               </p>
               <p className="text-[11px] text-slate-300">
-                Extrayendo tablas de cotizaciÃ³n, Ã­tems, precios unitarios, margen de utilidad por Ã­tem y consolidado antes de IVA para <strong className="text-indigo-200">{companyName}</strong>...
+                Extrayendo tablas de cotización, ítems, precios unitarios, margen de utilidad por ítem y consolidado antes de IVA para <strong className="text-indigo-200">{companyName}</strong>...
               </p>
             </div>
 
@@ -1436,7 +1436,7 @@ export default function CommercialProcurementHub({
                   type="button"
                   onClick={() => cameraInputRef.current?.click()}
                   className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-3xs"
-                  title="Tomar foto directa de una cotizaciÃ³n con tu cÃ¡mara o celular"
+                  title="Tomar foto directa de una cotización con tu cámara o celular"
                 >
                   <Camera className="w-3.5 h-3.5 text-indigo-600" /> Tomar Foto
                 </button>
@@ -1446,7 +1446,7 @@ export default function CommercialProcurementHub({
                   type="button"
                   onClick={() => imageInputRef.current?.click()}
                   className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-3xs"
-                  title="Cargar fotografÃ­a o captura de pantalla (JPG, PNG, WEBP, HEIC)"
+                  title="Cargar fotografía o captura de pantalla (JPG, PNG, WEBP, HEIC)"
                 >
                   <ImageIcon className="w-3.5 h-3.5 text-sky-600" /> Cargar Imagen / Foto
                 </button>
@@ -1456,7 +1456,7 @@ export default function CommercialProcurementHub({
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   className="flex items-center justify-center gap-1.5 px-3 py-1.5 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-3xs"
-                  title="Carga una cotizaciÃ³n en PDF, Excel o Word para adaptarla automÃ¡ticamente"
+                  title="Carga una cotización en PDF, Excel o Word para adaptarla automáticamente"
                 >
                   <Upload className="w-3.5 h-3.5 text-slate-600" /> Cargar PDF / Excel
                 </button>
@@ -1467,7 +1467,7 @@ export default function CommercialProcurementHub({
                   onClick={() => setIsCreatingQuote(!isCreatingQuote)}
                   className={`flex items-center justify-center gap-1.5 px-3 py-1.5 text-white rounded-lg text-xs font-bold transition-all cursor-pointer shadow-3xs ${brand.button}`}
                 >
-                  <Plus className="w-3.5 h-3.5" /> Nueva CotizaciÃ³n
+                  <Plus className="w-3.5 h-3.5" /> Nueva Cotización
                 </button>
               </div>
             </div>
@@ -1490,29 +1490,29 @@ export default function CommercialProcurementHub({
                 </div>
                 <div>
                   <div className="text-xs font-extrabold text-indigo-950 flex items-center gap-1.5">
-                    <span>Arrastra o pega (Ctrl+V) fotografÃ­as de cotizaciones, capturas, PDFs o Excels</span>
+                    <span>Arrastra o pega (Ctrl+V) fotografías de cotizaciones, capturas, PDFs o Excels</span>
                     <span className="px-1.5 py-0.2 bg-indigo-600 text-white rounded text-[9px] font-bold">OCR Activo</span>
                   </div>
                   <p className="text-[10px] text-slate-500">
-                    Soporta fotos de celular (JPG, PNG, HEIC, WEBP), presupuestos manuscritos o impresos, facturas y archivos de cÃ¡lculo.
+                    Soporta fotos de celular (JPG, PNG, HEIC, WEBP), presupuestos manuscritos o impresos, facturas y archivos de cálculo.
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-1.5 text-[10px] text-indigo-600 font-bold shrink-0">
-                <Camera className="w-3.5 h-3.5" /> O pulsa aquÃ­ para seleccionar
+                <Camera className="w-3.5 h-3.5" /> O pulsa aquí para seleccionar
               </div>
             </div>
 
             {/* AI Contextualization Instruction Box */}
             <div className="bg-gradient-to-r from-indigo-50/50 to-sky-50/50 border border-indigo-100 rounded-xl p-3.5 flex flex-col gap-2 shadow-2xs">
               <span className="text-[10px] font-extrabold text-indigo-950 uppercase tracking-wide flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5 text-indigo-600" /> InstrucciÃ³n de Contexto para AsimilaciÃ³n de la IA (Opcional)
+                <Sparkles className="w-3.5 h-3.5 text-indigo-600" /> Instrucción de Contexto para Asimilación de la IA (Opcional)
               </span>
               <p className="text-[10px] text-slate-500 leading-normal">
-                Escribe indicaciones especiales sobre el archivo que vas a cargar (ej: <em>"Aplica IVA del 19%, la referencia de la cotizaciÃ³n es REF-777-XYZ, margen de utilidad del 30%"</em>). La IA asimilarÃ¡ estos datos y adaptarÃ¡ los costos reales automÃ¡ticamente.
+                Escribe indicaciones especiales sobre el archivo que vas a cargar (ej: <em>"Aplica IVA del 19%, la referencia de la cotización es REF-777-XYZ, margen de utilidad del 30%"</em>). La IA asimilará estos datos y adaptará los costos reales automáticamente.
               </p>
               <textarea
-                placeholder="Escribe instrucciones de contextualizaciÃ³n para la IA aquÃ­ antes de cargar la fotografÃ­a o archivo..."
+                placeholder="Escribe instrucciones de contextualización para la IA aquí antes de cargar la fotografía o archivo..."
                 value={userInstruction}
                 onChange={(e) => setUserInstruction(e.target.value)}
                 className="w-full p-2 text-xs border rounded-lg bg-white text-slate-800 shadow-3xs focus:outline-indigo-500"
@@ -1520,12 +1520,12 @@ export default function CommercialProcurementHub({
               />
             </div>
 
-            {/* Formulario Nueva CotizaciÃ³n Manual */}
+            {/* Formulario Nueva Cotización Manual */}
             {isCreatingQuote && (
               <form onSubmit={handleSaveManualQuote} className="p-4 bg-slate-50 border rounded-xl flex flex-col gap-4 animate-fadeIn">
                 <div className="flex justify-between items-center border-b pb-2">
                   <h4 className="text-xs font-bold text-slate-700 uppercase flex items-center gap-1.5">
-                    <FileText className="w-4 h-4 text-slate-500" /> Crear CotizaciÃ³n para {companyId}
+                    <FileText className="w-4 h-4 text-slate-500" /> Crear Cotización para {companyId}
                   </h4>
                   <button type="button" onClick={() => setIsCreatingQuote(false)} className="text-slate-400 hover:text-slate-600">
                     <X className="w-4 h-4" />
@@ -1545,7 +1545,7 @@ export default function CommercialProcurementHub({
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">NIT / CÃ©dula</label>
+                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">NIT / Cédula</label>
                     <input 
                       type="text" 
                       placeholder="Ej: 900.281.334-1"
@@ -1555,7 +1555,7 @@ export default function CommercialProcurementHub({
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">Referencia de CotizaciÃ³n original</label>
+                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">Referencia de Cotización original</label>
                     <input 
                       type="text" 
                       placeholder="Ej: COT-WPC-0001"
@@ -1565,7 +1565,7 @@ export default function CommercialProcurementHub({
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">TelÃ©fono de Contacto</label>
+                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">Teléfono de Contacto</label>
                     <input 
                       type="text" 
                       placeholder="Ej: 315 281 9281"
@@ -1575,7 +1575,7 @@ export default function CommercialProcurementHub({
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">Correo ElectrÃ³nico</label>
+                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">Correo Electrónico</label>
                     <input 
                       type="email" 
                       placeholder="ejemplo@correo.com"
@@ -1585,7 +1585,7 @@ export default function CommercialProcurementHub({
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">Responsable de GestiÃ³n</label>
+                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">Responsable de Gestión</label>
                     <input 
                       type="text" 
                       placeholder="Nombre del responsable"
@@ -1595,10 +1595,10 @@ export default function CommercialProcurementHub({
                     />
                   </div>
                   <div className="flex flex-col gap-1 col-span-1 md:col-span-3">
-                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">DirecciÃ³n de Despacho / Obra</label>
+                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">Dirección de Despacho / Obra</label>
                     <input 
                       type="text" 
-                      placeholder="Ej: Calle 80 # 15-20 Of 402, BogotÃ¡"
+                      placeholder="Ej: Calle 80 # 15-20 Of 402, Bogotá"
                       value={quoteAddress}
                       onChange={(e) => setQuoteAddress(e.target.value)}
                       className="p-1.5 text-xs border rounded bg-white text-slate-800"
@@ -1609,11 +1609,11 @@ export default function CommercialProcurementHub({
                 <div className="flex flex-col gap-2 border-t pt-3">
                   <div className="flex flex-wrap justify-between items-center gap-2">
                     <span className="text-[10px] font-extrabold text-slate-700 uppercase tracking-wide">
-                      ARTÃCULOS O SERVICIOS COTIZADOS & MÃRGENES DE UTILIDAD
+                      ARTÍCULOS O SERVICIOS COTIZADOS & MÁRGENES DE UTILIDAD
                     </span>
                     <div className="flex items-center gap-1.5 text-[10px]">
                       <span className="text-slate-500 font-bold flex items-center gap-1">
-                        <Sliders className="w-3 h-3 text-indigo-600" /> Margen RÃ¡pido:
+                        <Sliders className="w-3 h-3 text-indigo-600" /> Margen Rápido:
                       </span>
                       {[0, 15, 20, 25, 30, 35, 40, 50].map((m) => (
                         <button
@@ -1638,13 +1638,13 @@ export default function CommercialProcurementHub({
                   <div className="overflow-x-auto">
                     <div className="min-w-[700px] flex flex-col gap-1.5">
                       <div className="grid grid-cols-12 gap-1.5 text-[8px] font-extrabold text-slate-500 uppercase px-1">
-                        <div className="col-span-1">CÃ³digo</div>
-                        <div className="col-span-4">DescripciÃ³n / Servicio</div>
+                        <div className="col-span-1">Código</div>
+                        <div className="col-span-4">Descripción / Servicio</div>
                         <div className="col-span-1 text-center">Cant.</div>
                         <div className="col-span-2 text-right">Costo Base Unit.</div>
                         <div className="col-span-1 text-center">% Utilidad</div>
                         <div className="col-span-2 text-right">Nuevo Valor Venta Unit.</div>
-                        <div className="col-span-1 text-center">AcciÃ³n</div>
+                        <div className="col-span-1 text-center">Acción</div>
                       </div>
 
                       {quoteItems.map((item, index) => {
@@ -1657,7 +1657,7 @@ export default function CommercialProcurementHub({
                             <div className="col-span-1">
                               <input 
                                 type="text" 
-                                placeholder="CÃ³d"
+                                placeholder="Cód"
                                 value={item.code}
                                 onChange={(e) => handleQuoteItemChange(index, "code", e.target.value)}
                                 className="w-full p-1 text-[11px] border rounded bg-white text-slate-800 font-mono font-bold"
@@ -1667,7 +1667,7 @@ export default function CommercialProcurementHub({
                               <input 
                                 type="text" 
                                 required
-                                placeholder="DescripciÃ³n del Ã­tem cotizado"
+                                placeholder="Descripción del ítem cotizado"
                                 value={item.desc}
                                 onChange={(e) => handleQuoteItemChange(index, "desc", e.target.value)}
                                 className="w-full p-1 text-[11px] border rounded bg-white text-slate-800 font-medium"
@@ -1723,7 +1723,7 @@ export default function CommercialProcurementHub({
                                 onClick={() => handleRemoveQuoteItemRow(index)}
                                 disabled={quoteItems.length === 1}
                                 className="p-1 text-red-500 hover:bg-red-50 rounded disabled:opacity-30 cursor-pointer"
-                                title="Eliminar Ã­tem"
+                                title="Eliminar ítem"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
@@ -1783,7 +1783,7 @@ export default function CommercialProcurementHub({
                 <div className="flex flex-col gap-1 border-t pt-3">
                   <label className="text-[9px] font-extrabold text-slate-500 uppercase">NOTAS / CONDICIONES COMERCIALES ADICIONALES</label>
                   <textarea 
-                    placeholder="Validez de oferta, formas de pago, garantÃ­as..."
+                    placeholder="Validez de oferta, formas de pago, garantías..."
                     value={quoteNotes}
                     onChange={(e) => setQuoteNotes(e.target.value)}
                     className="p-1.5 text-xs border rounded bg-white text-slate-800 h-16 resize-none"
@@ -1802,7 +1802,7 @@ export default function CommercialProcurementHub({
                     type="submit"
                     className={`px-3.5 py-1.5 text-white text-xs font-bold rounded-lg transition-all cursor-pointer ${brand.button}`}
                   >
-                    Guardar CotizaciÃ³n
+                    Guardar Cotización
                   </button>
                 </div>
               </form>
@@ -1830,7 +1830,7 @@ export default function CommercialProcurementHub({
                   {filteredEstimates.length === 0 ? (
                     <tr>
                       <td colSpan={11} className="p-6 text-center text-slate-400 font-medium">
-                        No hay cotizaciones registradas para {companyName}. Â¡Crea una nueva manual o sube un archivo!
+                        No hay cotizaciones registradas para {companyName}. ¡Crea una nueva manual o sube un archivo!
                       </td>
                     </tr>
                   ) : (
@@ -1843,14 +1843,14 @@ export default function CommercialProcurementHub({
                                 <div className="flex flex-wrap justify-between items-center border-b border-indigo-100 pb-2 gap-2">
                                   <div className="flex items-center gap-2">
                                     <span className="font-extrabold text-xs text-indigo-950 uppercase flex items-center gap-1.5">
-                                      <Sparkles className="w-4 h-4 text-indigo-600 animate-pulse" /> Editor de CotizaciÃ³n en Tiempo Real ({cot.id})
+                                      <Sparkles className="w-4 h-4 text-indigo-600 animate-pulse" /> Editor de Cotización en Tiempo Real ({cot.id})
                                     </span>
                                   </div>
 
                                   {/* Quick Global Margin Toolbar */}
                                   <div className="flex flex-wrap items-center gap-1.5 bg-white px-2.5 py-1 rounded-lg border border-indigo-200 shadow-xs">
                                     <span className="text-[10px] font-extrabold text-indigo-900 flex items-center gap-1">
-                                      <Percent className="w-3 h-3 text-indigo-600" /> Margen RÃ¡pido Global:
+                                      <Percent className="w-3 h-3 text-indigo-600" /> Margen Rápido Global:
                                     </span>
                                     {[0, 10, 15, 20, 25, 30, 35, 40, 50].map((marginVal) => (
                                       <button
@@ -1871,7 +1871,7 @@ export default function CommercialProcurementHub({
                                         setEstimates(prev => prev.map(e => e.id === cot.id ? editingEstimateData : e));
                                         setEditingEstimateId(null);
                                         setEditingEstimateData(null);
-                                        alert("âœ“ Cambios de cotizaciÃ³n y mÃ¡rgenes guardados con Ã©xito.");
+                                        alert("✓ Cambios de cotización y márgenes guardados con éxito.");
                                       }}
                                       className="px-3 py-1 bg-indigo-600 text-white rounded-lg text-xs font-extrabold hover:bg-indigo-700 shadow-sm transition-all cursor-pointer"
                                     >
@@ -1910,7 +1910,7 @@ export default function CommercialProcurementHub({
                                     />
                                   </div>
                                   <div className="flex flex-col gap-0.5">
-                                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">Referencia Original de CotizaciÃ³n</label>
+                                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">Referencia Original de Cotización</label>
                                     <input
                                       type="text"
                                       value={editingEstimateData.quoteReference || ""}
@@ -1929,12 +1929,12 @@ export default function CommercialProcurementHub({
                                     />
                                   </div>
                                   <div className="flex flex-col gap-0.5">
-                                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">Responsable de GestiÃ³n / Solicitud</label>
+                                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">Responsable de Gestión / Solicitud</label>
                                     <input
                                       type="text"
                                       value={editingEstimateData.responsiblePerson || ""}
                                       onChange={(e) => setEditingEstimateData({ ...editingEstimateData, responsiblePerson: e.target.value })}
-                                      placeholder="Ej: Rafael (LÃ­der)"
+                                      placeholder="Ej: Rafael (Líder)"
                                       className="p-1.5 text-xs border rounded bg-white text-slate-800 font-semibold"
                                     />
                                   </div>
@@ -1953,7 +1953,7 @@ export default function CommercialProcurementHub({
                                 <div className="border-t border-slate-200/60 pt-2.5 mt-1.5">
                                   <div className="flex justify-between items-center mb-1.5">
                                     <span className="text-[10px] font-extrabold text-slate-600 uppercase tracking-wide flex items-center gap-1.5">
-                                      <Calculator className="w-3.5 h-3.5 text-indigo-600" /> Desglose de Ãtems, Costos Base & MÃ¡rgenes de Utilidad (IVA 19% Calculado)
+                                      <Calculator className="w-3.5 h-3.5 text-indigo-600" /> Desglose de Ítems, Costos Base & Márgenes de Utilidad (IVA 19% Calculado)
                                     </span>
                                     <button
                                       type="button"
@@ -1975,7 +1975,7 @@ export default function CommercialProcurementHub({
                                       }}
                                       className="text-[10px] text-indigo-600 font-extrabold hover:underline flex items-center gap-1 cursor-pointer bg-white px-2 py-0.5 rounded border border-indigo-200"
                                     >
-                                      + Agregar Ãtem de CotizaciÃ³n
+                                      + Agregar Ítem de Cotización
                                     </button>
                                   </div>
 
@@ -1983,13 +1983,13 @@ export default function CommercialProcurementHub({
                                     <div className="min-w-[850px] flex flex-col gap-1.5">
                                       {/* Header row */}
                                       <div className="grid grid-cols-12 gap-1.5 text-[8px] font-black text-slate-400 uppercase px-1">
-                                        <div className="col-span-4">DescripciÃ³n / Servicio</div>
+                                        <div className="col-span-4">Descripción / Servicio</div>
                                         <div className="col-span-1 text-center">Cant.</div>
                                         <div className="col-span-2 text-right">Costo Base Unit.</div>
                                         <div className="col-span-1 text-center">% Utilidad</div>
                                         <div className="col-span-2 text-right">Nuevo Valor Venta Unit.</div>
                                         <div className="col-span-1 text-right">Total Fila</div>
-                                        <div className="col-span-1 text-center">AcciÃ³n</div>
+                                        <div className="col-span-1 text-center">Acción</div>
                                       </div>
 
                                       {editingEstimateData.items.map((it, idx) => {
@@ -2006,7 +2006,7 @@ export default function CommercialProcurementHub({
                                               value={it.description}
                                               onChange={(e) => handleEditItemValueChange(idx, "description", e.target.value)}
                                               className="col-span-4 p-1 text-[11px] border rounded bg-white font-medium text-slate-800"
-                                              placeholder="DescripciÃ³n"
+                                              placeholder="Descripción"
                                             />
                                             <input
                                               type="number"
@@ -2077,9 +2077,9 @@ export default function CommercialProcurementHub({
                                                   });
                                                 }}
                                                 className="text-red-500 hover:text-red-700 font-extrabold text-center text-sm p-1 rounded hover:bg-red-50 cursor-pointer"
-                                                title="Eliminar este Ã­tem"
+                                                title="Eliminar este ítem"
                                               >
-                                                Ã—
+                                                ×
                                               </button>
                                             </div>
                                           </div>
@@ -2195,7 +2195,7 @@ export default function CommercialProcurementHub({
                               <button
                                 onClick={() => handleGenerateQuotePDF(cot)}
                                 className="p-1 hover:bg-rose-50 rounded text-rose-600 transition-all cursor-pointer"
-                                title="Descargar PDF Formal de CotizaciÃ³n"
+                                title="Descargar PDF Formal de Cotización"
                               >
                                 <FileCheck className="w-4 h-4" />
                               </button>
@@ -2247,7 +2247,7 @@ export default function CommercialProcurementHub({
                                   setEditingEstimateData(cloned);
                                 }}
                                 className="p-1 hover:bg-indigo-50 rounded text-indigo-600 transition-all cursor-pointer"
-                                title="Editar CotizaciÃ³n & MÃ¡rgenes en Tiempo Real"
+                                title="Editar Cotización & Márgenes en Tiempo Real"
                               >
                                 <Edit className="w-4 h-4" />
                               </button>
@@ -2261,13 +2261,13 @@ export default function CommercialProcurementHub({
                                       type: "VENTA",
                                       amount: cot.total,
                                       customerSupplier: cot.customer,
-                                      description: `FacturaciÃ³n de la cotizaciÃ³n aprobada ${cot.id} para ${cot.customer}`,
+                                      description: `Facturación de la cotización aprobada ${cot.id} para ${cot.customer}`,
                                       category: "Venta Comercial",
                                       status: "CONTABILIZADO",
-                                      account: "413505 - Ventas de MercancÃ­as",
+                                      account: "413505 - Ventas de Mercancías",
                                       companyId
                                     });
-                                    alert(`âœ“ CotizaciÃ³n aprobada. Se ha registrado un ingreso contable (VENTA) por ${formatCOP(cot.total)}.`);
+                                    alert(`✓ Cotización aprobada. Se ha registrado un ingreso contable (VENTA) por ${formatCOP(cot.total)}.`);
                                   }}
                                   className="px-2 py-0.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[9px] font-extrabold rounded"
                                   title="Aprobar y Registrar Ingreso en Contabilidad"
@@ -2292,7 +2292,7 @@ export default function CommercialProcurementHub({
           <div className="flex flex-col gap-4">
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 border-b pb-3">
               <div>
-                <h3 className="text-xs font-extrabold text-slate-700 uppercase tracking-wider">Ã“rdenes de Compra Emitidas ({companyId})</h3>
+                <h3 className="text-xs font-extrabold text-slate-700 uppercase tracking-wider">Órdenes de Compra Emitidas ({companyId})</h3>
                 <p className="text-[10px] text-slate-400">Gestione solicitudes de abastecimiento y adquisiciones de insumos y servicios</p>
               </div>
 
@@ -2331,7 +2331,7 @@ export default function CommercialProcurementHub({
                   type="button"
                   onClick={() => poCameraInputRef.current?.click()}
                   className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-3xs"
-                  title="Tomar foto directa a una factura o presupuesto con tu cÃ¡mara o celular"
+                  title="Tomar foto directa a una factura o presupuesto con tu cámara o celular"
                 >
                   <Camera className="w-3.5 h-3.5 text-indigo-600" /> Tomar Foto Factura
                 </button>
@@ -2341,7 +2341,7 @@ export default function CommercialProcurementHub({
                   type="button"
                   onClick={() => poImageInputRef.current?.click()}
                   className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-3xs"
-                  title="Cargar fotografÃ­a o imagen de factura de proveedor (JPG, PNG, WEBP, HEIC)"
+                  title="Cargar fotografía o imagen de factura de proveedor (JPG, PNG, WEBP, HEIC)"
                 >
                   <ImageIcon className="w-3.5 h-3.5 text-sky-600" /> Cargar Foto / Factura
                 </button>
@@ -2351,7 +2351,7 @@ export default function CommercialProcurementHub({
                   type="button"
                   onClick={() => poFileInputRef.current?.click()}
                   className="flex items-center justify-center gap-1.5 px-3 py-1.5 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-3xs"
-                  title="Carga una factura o cotizaciÃ³n de proveedor en PDF o Excel para generar la orden"
+                  title="Carga una factura o cotización de proveedor en PDF o Excel para generar la orden"
                 >
                   <Upload className="w-3.5 h-3.5 text-slate-600" /> Cargar PDF / Excel
                 </button>
@@ -2385,29 +2385,29 @@ export default function CommercialProcurementHub({
                 </div>
                 <div>
                   <div className="text-xs font-extrabold text-indigo-950 flex items-center gap-1.5">
-                    <span>Arrastra o pega (Ctrl+V) fotografÃ­as de facturas, presupuestos de proveedores o PDFs</span>
-                    <span className="px-1.5 py-0.2 bg-indigo-600 text-white rounded text-[9px] font-bold">GeneraciÃ³n AutomÃ¡tica</span>
+                    <span>Arrastra o pega (Ctrl+V) fotografías de facturas, presupuestos de proveedores o PDFs</span>
+                    <span className="px-1.5 py-0.2 bg-indigo-600 text-white rounded text-[9px] font-bold">Generación Automática</span>
                   </div>
                   <p className="text-[10px] text-slate-500">
-                    La IA extraerÃ¡ proveedores, referencias, costos unitarios, cantidades e impuestos para emitir la Orden de Compra y contabilizarla.
+                    La IA extraerá proveedores, referencias, costos unitarios, cantidades e impuestos para emitir la Orden de Compra y contabilizarla.
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-1.5 text-[10px] text-indigo-600 font-bold shrink-0">
-                <Camera className="w-3.5 h-3.5" /> O pulsa aquÃ­ para seleccionar foto
+                <Camera className="w-3.5 h-3.5" /> O pulsa aquí para seleccionar foto
               </div>
             </div>
 
             {/* AI Contextualization Instruction Box */}
             <div className="bg-gradient-to-r from-indigo-50/50 to-sky-50/50 border border-indigo-100 rounded-xl p-3.5 flex flex-col gap-2 shadow-2xs">
               <span className="text-[10px] font-extrabold text-indigo-950 uppercase tracking-wide flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5 text-indigo-600" /> InstrucciÃ³n de Contexto para GeneraciÃ³n de O.C. por IA (Opcional)
+                <Sparkles className="w-3.5 h-3.5 text-indigo-600" /> Instrucción de Contexto para Generación de O.C. por IA (Opcional)
               </span>
               <p className="text-[10px] text-slate-500 leading-normal">
-                Escribe indicaciones especiales sobre la cotizaciÃ³n del proveedor que vas a cargar para generar tu orden de compra formal (ej: <em>"Aplica IVA del 19%, asigna a Servientrega como transportadora y la referencia de cotizaciÃ³n es Brembo-998, asimilado por Rafael"</em>).
+                Escribe indicaciones especiales sobre la cotización del proveedor que vas a cargar para generar tu orden de compra formal (ej: <em>"Aplica IVA del 19%, asigna a Servientrega como transportadora y la referencia de cotización es Brembo-998, asimilado por Rafael"</em>).
               </p>
               <textarea
-                placeholder="Escribe instrucciones de contextualizaciÃ³n para la IA aquÃ­ antes de cargar la fotografÃ­a o cotizaciÃ³n de proveedor..."
+                placeholder="Escribe instrucciones de contextualización para la IA aquí antes de cargar la fotografía o cotización de proveedor..."
                 value={userInstruction}
                 onChange={(e) => setUserInstruction(e.target.value)}
                 className="w-full p-2 text-xs border rounded-lg bg-white text-slate-800 shadow-3xs focus:outline-indigo-500"
@@ -2440,7 +2440,7 @@ export default function CommercialProcurementHub({
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">Transportadora / Operador LogÃ­stico</label>
+                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">Transportadora / Operador Logístico</label>
                     <input 
                       type="text" 
                       placeholder="Ej: Servientrega, DHL, FedEx"
@@ -2474,7 +2474,7 @@ export default function CommercialProcurementHub({
                   {poItems.map((item, index) => (
                     <div key={index} className="grid grid-cols-1 md:grid-cols-12 gap-2 items-end">
                       <div className="md:col-span-2 flex flex-col gap-0.5">
-                        <label className="text-[8px] font-bold text-slate-400">CÃ“DIGO</label>
+                        <label className="text-[8px] font-bold text-slate-400">CÓDIGO</label>
                         <input 
                           type="text" 
                           placeholder="Ej: FR-BRM-10"
@@ -2484,11 +2484,11 @@ export default function CommercialProcurementHub({
                         />
                       </div>
                       <div className="md:col-span-5 flex flex-col gap-0.5">
-                        <label className="text-[8px] font-bold text-slate-400">DESCRIPCIÃ“N DEL INSUMO</label>
+                        <label className="text-[8px] font-bold text-slate-400">DESCRIPCIÓN DEL INSUMO</label>
                         <input 
                           type="text" 
                           required
-                          placeholder="DescripciÃ³n detallada"
+                          placeholder="Descripción detallada"
                           value={item.desc}
                           onChange={(e) => handlePoItemChange(index, "desc", e.target.value)}
                           className="p-1 text-xs border rounded bg-white text-slate-800 font-medium"
@@ -2580,7 +2580,7 @@ export default function CommercialProcurementHub({
                   {filteredPOs.length === 0 ? (
                     <tr>
                       <td colSpan={10} className="p-6 text-center text-slate-400 font-medium">
-                        No hay Ã³rdenes de compra emitidas para {companyName}. Â¡Crea una nueva manual o procesa una por IA!
+                        No hay órdenes de compra emitidas para {companyName}. ¡Crea una nueva manual o procesa una por IA!
                       </td>
                     </tr>
                   ) : (
@@ -2601,7 +2601,7 @@ export default function CommercialProcurementHub({
                                         setPurchaseOrders(prev => prev.map(p => p.id === po.id ? editingPoData : p));
                                         setEditingPoId(null);
                                         setEditingPoData(null);
-                                        alert("âœ“ Cambios de orden de compra guardados con Ã©xito.");
+                                        alert("✓ Cambios de orden de compra guardados con éxito.");
                                       }}
                                       className="px-3 py-1 bg-emerald-600 text-white rounded-lg text-xs font-extrabold hover:bg-emerald-700 shadow-sm transition-all cursor-pointer"
                                     >
@@ -2631,7 +2631,7 @@ export default function CommercialProcurementHub({
                                     />
                                   </div>
                                   <div className="flex flex-col gap-0.5">
-                                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">Referencia de CotizaciÃ³n Proveedor</label>
+                                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">Referencia de Cotización Proveedor</label>
                                     <input
                                       type="text"
                                       value={editingPoData.quoteReference || ""}
@@ -2641,7 +2641,7 @@ export default function CommercialProcurementHub({
                                     />
                                   </div>
                                   <div className="flex flex-col gap-0.5">
-                                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">Fecha CotizaciÃ³n Proveedor</label>
+                                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">Fecha Cotización Proveedor</label>
                                     <input
                                       type="date"
                                       value={editingPoData.quoteDate || ""}
@@ -2650,7 +2650,7 @@ export default function CommercialProcurementHub({
                                     />
                                   </div>
                                   <div className="flex flex-col gap-0.5">
-                                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">Responsable de GestiÃ³n</label>
+                                    <label className="text-[9px] font-extrabold text-slate-500 uppercase">Responsable de Gestión</label>
                                     <input
                                       type="text"
                                       value={editingPoData.responsiblePerson || ""}
@@ -2665,7 +2665,7 @@ export default function CommercialProcurementHub({
                                       type="text"
                                       value={editingPoData.notes || ""}
                                       onChange={(e) => setEditingPoData({ ...editingPoData, notes: e.target.value })}
-                                      placeholder="Plazos, penalidades, garantÃ­as..."
+                                      placeholder="Plazos, penalidades, garantías..."
                                       className="p-1.5 text-xs border rounded bg-white text-slate-800"
                                     />
                                   </div>
@@ -2683,7 +2683,7 @@ export default function CommercialProcurementHub({
 
                                 <div className="border-t border-slate-200/60 pt-2.5 mt-1.5">
                                   <div className="flex justify-between items-center mb-1.5">
-                                    <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wide">Desglose de Ãtems & Costos de AdquisiciÃ³n (IVA 19% Incluido)</span>
+                                    <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wide">Desglose de Ítems & Costos de Adquisición (IVA 19% Incluido)</span>
                                     <button
                                       type="button"
                                       onClick={() => {
@@ -2692,7 +2692,7 @@ export default function CommercialProcurementHub({
                                       }}
                                       className="text-[10px] text-emerald-700 font-extrabold hover:underline"
                                     >
-                                      + Agregar Ãtem de Compra
+                                      + Agregar Ítem de Compra
                                     </button>
                                   </div>
                                   <div className="flex flex-col gap-1.5">
@@ -2707,7 +2707,7 @@ export default function CommercialProcurementHub({
                                             setEditingPoData({ ...editingPoData, items: updated });
                                           }}
                                           className="col-span-6 p-1 text-[11px] border rounded bg-white font-medium text-slate-800"
-                                          placeholder="DescripciÃ³n del material"
+                                          placeholder="Descripción del material"
                                         />
                                         <input
                                           type="number"
@@ -2769,7 +2769,7 @@ export default function CommercialProcurementHub({
                                           }}
                                           className="col-span-1 text-red-500 hover:text-red-700 font-extrabold text-center text-xs"
                                         >
-                                          Ã—
+                                          ×
                                         </button>
                                       </div>
                                     ))}
@@ -2897,7 +2897,7 @@ export default function CommercialProcurementHub({
               </div>
               <div>
                 <h3 className="text-xs font-extrabold text-slate-700 uppercase tracking-wider">Base IA de Aprendizaje de Cotizaciones y Costeo</h3>
-                <p className="text-[10px] text-slate-400">Modelos predictivos entrenados dinÃ¡micamente de acuerdo a las cotizaciones histÃ³ricas del holding</p>
+                <p className="text-[10px] text-slate-400">Modelos predictivos entrenados dinámicamente de acuerdo a las cotizaciones históricas del holding</p>
               </div>
             </div>
 
@@ -2906,7 +2906,7 @@ export default function CommercialProcurementHub({
                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wide">Contexto del Holding</span>
                 <span className="text-sm font-bold text-slate-800">Cruce de Bases de Datos</span>
                 <p className="text-[10px] text-slate-500 leading-relaxed">
-                  Las bases de datos estÃ¡n segregadas para garantizar que WPC, FundaciÃ³n, Raez y Helenamar operen independientemente. La IA aprende de cada una para simular escenarios de costeo autÃ³nomo.
+                  Las bases de datos están segregadas para garantizar que WPC, Fundación, Raez y Helenamar operen independientemente. La IA aprende de cada una para simular escenarios de costeo autónomo.
                 </p>
               </div>
 
@@ -2914,7 +2914,7 @@ export default function CommercialProcurementHub({
                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wide">Algoritmo de Viabilidad</span>
                 <span className="text-sm font-bold text-slate-800">Rentabilidad & Imprevistos</span>
                 <p className="text-[10px] text-slate-500 leading-relaxed">
-                  Basado en las cotizaciones anteriores cargadas, la IA calcula variaciones de precios de materias primas y mano de obra para advertir sobre posibles pÃ©rdidas o costos ocultos de ejecuciÃ³n.
+                  Basado en las cotizaciones anteriores cargadas, la IA calcula variaciones de precios de materias primas y mano de obra para advertir sobre posibles pérdidas o costos ocultos de ejecución.
                 </p>
               </div>
 
@@ -2922,7 +2922,7 @@ export default function CommercialProcurementHub({
                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wide">Auto-Entrenamiento</span>
                 <span className="text-sm font-bold text-slate-800">Tiempo de Entrega (E.T.A)</span>
                 <p className="text-[10px] text-slate-500 leading-relaxed">
-                  El sistema extrae el tiempo estimado de ejecuciÃ³n de servicios previos y ajusta el cronograma de capacidad de los operarios mecÃ¡nicos (Raez) o disponibilidad de bienes (Helenamar).
+                  El sistema extrae el tiempo estimado de ejecución de servicios previos y ajusta el cronograma de capacidad de los operarios mecánicos (Raez) o disponibilidad de bienes (Helenamar).
                 </p>
               </div>
             </div>
@@ -2935,7 +2935,7 @@ export default function CommercialProcurementHub({
               <div className="divide-y divide-slate-100 bg-white">
                 {filteredLearning.length === 0 ? (
                   <div className="p-8 text-center text-slate-400 text-xs font-semibold">
-                    No se han registrado aprendizajes aÃºn. Sube archivos de cotizaciones previas en el tab "Cotizaciones de Venta" para comenzar a entrenar el modelo.
+                    No se han registrado aprendizajes aún. Sube archivos de cotizaciones previas en el tab "Cotizaciones de Venta" para comenzar a entrenar el modelo.
                   </div>
                 ) : (
                   filteredLearning.map((learn, learnIdx) => (
@@ -2958,7 +2958,7 @@ export default function CommercialProcurementHub({
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 border-t pt-2.5 text-[10px]">
                         <div className="flex flex-col gap-1 bg-sky-50/40 p-2.5 border border-sky-100/50 rounded-lg">
                           <span className="font-extrabold text-sky-800 flex items-center gap-1">
-                            <TrendingUp className="w-3.5 h-3.5" /> ANÃLISIS DE UTILIDAD Y VIABILIDAD
+                            <TrendingUp className="w-3.5 h-3.5" /> ANÁLISIS DE UTILIDAD Y VIABILIDAD
                           </span>
                           <p className="text-slate-600 leading-relaxed">{learn.profitabilityAnalysis}</p>
                         </div>
@@ -2972,7 +2972,7 @@ export default function CommercialProcurementHub({
 
                         <div className="flex flex-col gap-1 bg-indigo-50/40 p-2.5 border border-indigo-100/50 rounded-lg">
                           <span className="font-extrabold text-indigo-800 flex items-center gap-1">
-                            <Brain className="w-3.5 h-3.5 animate-pulse" /> ESTIMACIÃ“N DE IMPREVISTOS
+                            <Brain className="w-3.5 h-3.5 animate-pulse" /> ESTIMACIÓN DE IMPREVISTOS
                           </span>
                           <p className="text-slate-600 leading-relaxed">{learn.imprevistos}</p>
                         </div>

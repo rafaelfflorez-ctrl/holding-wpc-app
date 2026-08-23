@@ -19,6 +19,10 @@ body { overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
 img, video, canvas, svg { max-width: 100%; height: auto; }
 table { display: block; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
+/* Pulido tipográfico */
+h1, h2, h3 { text-wrap: balance; letter-spacing: -0.015em; }
+p { text-wrap: pretty; }
+
 /* TV - Full HD 1920px+ (viewing distance) */
 @media (min-width: 1920px) {
   html { font-size: 18px; }
