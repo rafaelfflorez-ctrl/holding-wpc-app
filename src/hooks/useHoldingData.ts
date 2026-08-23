@@ -12,6 +12,7 @@ import {
   UserRole,
   Transaction,
   InventoryItem,
+  InventoryHistoryEntry,
   PurchaseOrder,
   Estimate,
   ServiceOrder,
@@ -27,6 +28,7 @@ export const APP_DATA_KEYS = [
   "users",
   "transactions",
   "inventory",
+  "inventoryHistory",
   "purchaseOrders",
   "estimates",
   "serviceOrders",
@@ -44,6 +46,7 @@ interface Setters {
   setUsers: (v: UserProfile[]) => void;
   setTransactions: (v: Transaction[]) => void;
   setInventory: (v: InventoryItem[]) => void;
+  setInventoryHistory: (v: InventoryHistoryEntry[]) => void;
   setPurchaseOrders: (v: PurchaseOrder[]) => void;
   setEstimates: (v: Estimate[]) => void;
   setServiceOrders: (v: ServiceOrder[]) => void;
@@ -68,6 +71,7 @@ async function loadAllData(supabase: SupabaseClient, session: Session, setters: 
   if (Array.isArray(map.users)) setters.setUsers(map.users);
   if (Array.isArray(map.transactions)) setters.setTransactions(map.transactions);
   if (Array.isArray(map.inventory)) setters.setInventory(map.inventory);
+  if (Array.isArray(map.inventoryHistory)) setters.setInventoryHistory(map.inventoryHistory);
   if (Array.isArray(map.purchaseOrders)) setters.setPurchaseOrders(map.purchaseOrders);
   if (Array.isArray(map.estimates)) setters.setEstimates(map.estimates);
   if (Array.isArray(map.serviceOrders)) setters.setServiceOrders(map.serviceOrders);
@@ -108,6 +112,7 @@ export function useHoldingData() {
   const [users, setUsers] = useState<UserProfile[]>(INITIAL_USERS);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [inventoryHistory, setInventoryHistory] = useState<InventoryHistoryEntry[]>([]);
   const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>([]);
   const [estimates, setEstimates] = useState<Estimate[]>([]);
   const [serviceOrders, setServiceOrders] = useState<ServiceOrder[]>([]);
@@ -141,6 +146,7 @@ export function useHoldingData() {
               setUsers,
               setTransactions,
               setInventory,
+              setInventoryHistory,
               setPurchaseOrders,
               setEstimates,
               setServiceOrders,
@@ -173,6 +179,7 @@ export function useHoldingData() {
       setUsers,
       setTransactions,
       setInventory,
+      setInventoryHistory,
       setPurchaseOrders,
       setEstimates,
       setServiceOrders,
@@ -202,6 +209,7 @@ export function useHoldingData() {
       users,
       transactions,
       inventory,
+      inventoryHistory,
       purchaseOrders,
       estimates,
       serviceOrders,
@@ -211,7 +219,7 @@ export function useHoldingData() {
       thresholds,
       notifications,
     }),
-    [users, transactions, inventory, purchaseOrders, estimates, serviceOrders, properties, programs, donations, thresholds, notifications]
+    [users, transactions, inventory, inventoryHistory, purchaseOrders, estimates, serviceOrders, properties, programs, donations, thresholds, notifications]
   );
   const dataSnapshot = JSON.stringify(allData);
 
@@ -259,6 +267,7 @@ export function useHoldingData() {
           setUsers,
           setTransactions,
           setInventory,
+          setInventoryHistory,
           setPurchaseOrders,
           setEstimates,
           setServiceOrders,
@@ -296,6 +305,8 @@ export function useHoldingData() {
     setTransactions,
     inventory,
     setInventory,
+    inventoryHistory,
+    setInventoryHistory,
     purchaseOrders,
     setPurchaseOrders,
     estimates,

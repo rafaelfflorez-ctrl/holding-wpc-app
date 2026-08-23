@@ -107,6 +107,8 @@ export default function App() {
     setTransactions,
     inventory,
     setInventory,
+    inventoryHistory,
+    setInventoryHistory,
     purchaseOrders,
     setPurchaseOrders,
     estimates,
@@ -995,6 +997,8 @@ export default function App() {
             <WpcInventoryPanel
               inventory={inventory}
               setInventory={setInventory}
+              history={inventoryHistory}
+              setHistory={setInventoryHistory}
               purchaseOrders={purchaseOrders}
               setPurchaseOrders={setPurchaseOrders}
               estimates={estimates}
@@ -1074,6 +1078,7 @@ export default function App() {
           {activeTab === "REPORTS" && (
             <ReportsPanel
               transactions={transactions}
+              inventory={inventory}
               userRole={currentUser.role}
             />
           )}

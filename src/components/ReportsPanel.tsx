@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
-import { Transaction, UserRole } from "../types";
-import { DEFAULT_COST_OF_SALES_RATIO, sumLedger, csvEscape } from "../utils/finance";
+import { Transaction, UserRole, InventoryItem } from "../types";
+import { DEFAULT_COST_OF_SALES_RATIO, sumLedger, csvEscape, inventoryValue } from "../utils/finance";
 import { HOLDING_COMPANIES } from "../data";
 import WpcLogo from "./WpcLogo";
 import MakerHoldingLogo from "./MakerHoldingLogo";
@@ -21,12 +21,13 @@ import {
 
 interface ReportsPanelProps {
   transactions: Transaction[];
+  inventory: InventoryItem[];
   userRole: UserRole;
 }
 
 type ActiveReportTab = "ESTADO_RESULTADOS" | "BALANCE_GENERAL" | "LIBRO_MAYOR" | "ALCANCE";
 
-export default function ReportsPanel({ transactions, userRole }: ReportsPanelProps) {
+export default function ReportsPanel({ transactions, inventory, userRole }: ReportsPanelProps) {
   const [activeTab, setActiveTab] = useState<ActiveReportTab>("ESTADO_RESULTADOS");
 
   // Rango de fechas por defecto: mes en curso (fecha local).
@@ -74,7 +75,8 @@ export default function ReportsPanel({ transactions, userRole }: ReportsPanelPro
 
     const cajaYBancos = recaudos - pagos - gastos;
     const clientesCartera = ventas - recaudos;
-    const inventariosVal = compras - (ventas * DEFAULT_COST_OF_SALES_RATIO);
+    // Inventario REAL del módulo (valor a costo unitario), no una heurística de compras.
+    const inventariosVal = inventoryValue(inventory, companyCode === "ALL" ? undefined : companyCode);
     const proveedoresPagar = compras - pagos;
     const obligacionesCorrientes = gastos * 0.15;
 
@@ -86,9 +88,11 @@ export default function ReportsPanel({ transactions, userRole }: ReportsPanelPro
     const utilidadNeta = utilidadOperacional - provisionImpuestos;
 
     const totalPasivos = proveedoresPagar + obligacionesCorrientes;
+    // Ecuación patrimonial garantizada: Activo = Pasivo + Patrimonio.
+    const totalPatrimonio = totalActivos - totalPasivos;
     const capitalSocial = 0;
-    const utilidadesAcumuladas = 0;
-    const totalPatrimonio = capitalSocial + utilidadesAcumuladas + utilidadNeta;
+    // "Resultados de ejercicios anteriores" = la partida de cierre que cuadra la ecuación.
+    const utilidadesAcumuladas = totalPatrimonio - capitalSocial - utilidadNeta;
 
     return {
       ventas, costoVentas, utilidadBruta, gastos, utilidadOperacional, provisionImpuestos, utilidadNeta,

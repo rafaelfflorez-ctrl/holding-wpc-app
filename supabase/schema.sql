@@ -50,6 +50,7 @@ insert into public.app_data (key, value) values
   ('users', '[]'::jsonb),
   ('transactions', '[]'::jsonb),
   ('inventory', '[]'::jsonb),
+  ('inventoryHistory', '[]'::jsonb),
   ('purchaseOrders', '[]'::jsonb),
   ('estimates', '[]'::jsonb),
   ('serviceOrders', '[]'::jsonb),

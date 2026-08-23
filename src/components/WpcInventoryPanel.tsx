@@ -34,6 +34,8 @@ import {
 interface WpcInventoryPanelProps {
   inventory: InventoryItem[];
   setInventory: React.Dispatch<React.SetStateAction<InventoryItem[]>>;
+  history: InventoryHistoryEntry[];
+  setHistory: React.Dispatch<React.SetStateAction<InventoryHistoryEntry[]>>;
   purchaseOrders: PurchaseOrder[];
   setPurchaseOrders: React.Dispatch<React.SetStateAction<PurchaseOrder[]>>;
   estimates: Estimate[];
@@ -45,6 +47,8 @@ interface WpcInventoryPanelProps {
 export default function WpcInventoryPanel({
   inventory,
   setInventory,
+  history,
+  setHistory,
   purchaseOrders,
   setPurchaseOrders,
   estimates,
@@ -60,8 +64,7 @@ export default function WpcInventoryPanel({
   const [lineFilter, setLineFilter] = useState("ALL");
   const [statusFilter, setStatusFilter] = useState("ALL");
 
-  // History tracking
-  const [history, setHistory] = useState<InventoryHistoryEntry[]>([]);
+  // History tracking (persistido en la nube via props: useHoldingData)
 
   // Adjustments Form state
   const [isAdjusting, setIsAdjusting] = useState(false);
