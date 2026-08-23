@@ -169,7 +169,16 @@ async function callOpenAIChat(systemPrompt: string, userPrompt: string): Promise
     throw new HttpError(isQuota ? 429 : res.status, isQuota ? "Cuota del proveedor de IA alcanzada. Intenta en un momento." : `El proveedor de IA respondió ${res.status}.`);
   }
   const data = await res.json();
-  return data?.choices?.[0]?.message?.content || "No se pudo generar respuesta.";
+  let content = data?.choices?.[0]?.message?.content || "No se pudo generar respuesta.";
+  // Modelos de razonamiento (Qwen, DeepSeek, gpt-oss en Groq) incluyen bloques
+  // <think>...</think>. Se eliminan; si no hay cierre, se borra desde <think> al final.
+  let cleaned = String(content).replace(/<think>[\s\S]*?<\/think>\s*/gi, "").trim();
+  if (cleaned.includes("<think>")) {
+    cleaned = cleaned.replace(/<think>[\s\S]*/gi, "").trim();
+  }
+  // Fallback por si el modelo no usa tags pero empieza con el prefijo en inglés
+  cleaned = cleaned.replace(/^\s*Here's a thinking process:[\s\S]*?\n\s*\n/gi, "").trim();
+  return cleaned || String(content).replace(/<think>[\s\S]*/gi, "").trim() || "No se pudo generar respuesta.";
 }
 
 async function startServer() {
