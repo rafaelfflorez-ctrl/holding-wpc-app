@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#0f172a"/>
+  <g transform="translate(128,128)">
+    <path d="M40 20 L90 70 L40 120 L0 70 Z" fill="#6366f1" opacity="0.95"/>
+    <path d="M90 20 L140 70 L90 120 L40 70 Z" fill="#818cf8" opacity="0.9"/>
+    <path d="M140 20 L190 70 L140 120 L90 70 Z" fill="#6366f1" opacity="0.85"/>
+    <text x="96" y="200" text-anchor="middle" font-family="system-ui,sans-serif" font-size="42" font-weight="800" fill="#f8fafc" letter-spacing="2">WPC</text>
+    <text x="96" y="230" text-anchor="middle" font-family="system-ui,sans-serif" font-size="14" font-weight="600" fill="#94a3b8" letter-spacing="4">HOLDING</text>
+  </g>
+</svg>

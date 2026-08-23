@@ -22,6 +22,7 @@ import RealTimeFeed from "./components/RealTimeFeed";
 import ReportsPanel from "./components/ReportsPanel";
 import RoleManagement from "./components/RoleManagement";
 import NotificationSettings from "./components/NotificationSettings";
+import DianPanel from "./components/DianPanel";
 
 // Multi-company holding sub-panels
 import WpcInventoryPanel from "./components/WpcInventoryPanel";
@@ -80,6 +81,7 @@ type ActiveTab =
   | "HELENAMAR" 
   | "AI_ADVISOR" 
   | "TRANSACTIONS" 
+  | "DIAN" 
   | "REPORTS" 
   | "USERS" 
   | "SETTINGS";
@@ -518,6 +520,17 @@ export default function App() {
             </button>
 
             <button
+              onClick={() => setActiveTab("DIAN")}
+              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all font-semibold ${
+                activeTab === "DIAN" 
+                  ? "bg-sky-600 text-white shadow-lg" 
+                  : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200"
+              }`}
+            >
+              <ShieldCheck className="w-4 h-4" /> Facturación DIAN
+            </button>
+
+            <button
               onClick={() => setActiveTab("REPORTS")}
               className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all font-semibold ${
                 activeTab === "REPORTS" 
@@ -640,6 +653,12 @@ export default function App() {
             className={`p-2.5 rounded-lg flex items-center gap-3 ${activeTab === "TRANSACTIONS" ? "bg-sky-600 text-white" : ""}`}
           >
             <Layers className="w-4 h-4" /> Operaciones PUC
+          </button>
+          <button
+            onClick={() => { setActiveTab("DIAN"); setIsMobileMenuOpen(false); }}
+            className={`p-2.5 rounded-lg flex items-center gap-3 ${activeTab === "DIAN" ? "bg-sky-600 text-white" : ""}`}
+          >
+            <ShieldCheck className="w-4 h-4" /> Facturación DIAN
           </button>
           <button
             onClick={() => { setActiveTab("REPORTS"); setIsMobileMenuOpen(false); }}
@@ -1094,6 +1113,11 @@ export default function App() {
               onDeleteTransaction={handleDeleteTransaction}
               onClearAllTransactions={handleClearAllTransactions}
             />
+          )}
+
+          {/* TAB: DIAN ELECTRONIC INVOICING */}
+          {activeTab === "DIAN" && (
+            <DianPanel onImport={handleAddTransaction} />
           )}
 
           {/* TAB 3: REPORTS & DETAILED BALANCE SHEETS */}
