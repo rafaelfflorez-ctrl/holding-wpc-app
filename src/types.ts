@@ -278,3 +278,13 @@ export interface Donation {
   legalReceiptNumber: string;
   taxDiscountValue: number; // 25% under Art 257 ET Colombia
 }
+
+// AUDIT LOG (C4)
+export interface AuditEntry {
+  id: string;
+  timestamp: string;
+  user: string;
+  action: string;
+  detail: string;
+  companyId?: string;
+}

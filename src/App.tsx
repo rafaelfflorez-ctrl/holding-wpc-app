@@ -101,6 +101,8 @@ export default function App() {
     login,
     logout,
     createUserAccount,
+    updateUserProfile,
+    changePassword,
     users,
     setUsers,
     transactions,
@@ -125,6 +127,7 @@ export default function App() {
     setThresholds,
     notifications,
     setNotifications,
+    logAudit,
   } = holding;
 
   const configMissing = Boolean(holding.config) &&
@@ -207,6 +210,9 @@ export default function App() {
     
     setTransactions(prev => [transaction, ...prev]);
 
+    // Auditoría (C4)
+    logAudit("TRANSACCION_CREADA", `Tipo ${transaction.type} por ${transaction.amount} (${transaction.customerSupplier}) estado ${transaction.status}.`, transaction.companyId);
+
     // Add immediate action notification
     const newNotification: Notification = {
       id: `noti-${Date.now()}`,
@@ -223,6 +229,7 @@ export default function App() {
   const handleUpdateTransactionStatus = (id: string, status: "BORRADOR" | "CONTABILIZADO" | "ANULADO") => {
     setTransactions(prev => prev.map(t => t.id === id ? { ...t, status } : t));
     setToastMessage(`Asiento ${id} actualizado a estado: ${status}`);
+    logAudit("ESTADO_CAMBIADO", `Asiento ${id} marcado como ${status}.`);
     
     const noti: Notification = {
       id: `noti-up-${Date.now()}`,
@@ -238,30 +245,45 @@ export default function App() {
   const handleDeleteTransaction = (id: string) => {
     setTransactions(prev => prev.filter(t => t.id !== id));
     setToastMessage(`Transacción ${id} eliminada físicamente de la base de datos.`);
+    logAudit("TRANSACCION_ELIMINADA", `Asiento ${id} eliminado físicamente.`);
   };
 
   const handleClearAllTransactions = () => {
     if (window.confirm("¿Está seguro de que desea limpiar todos los asientos contables actuales? La plataforma quedará en cero lista para el ingreso de sus transacciones reales.")) {
       setTransactions([]);
       setToastMessage("✓ Libro contable limpiado en su totalidad. Registre sus transacciones reales.");
+      logAudit("LIBRO_LIMPIADO", "Todos los asientos contables fueron eliminados.");
     }
   };
 
-  // User Administration Handlers
-  const handleToggleUserStatus = (userId: string) => {
-    setUsers(prev => prev.map(u => u.id === userId ? { ...u, isActive: !u.isActive } : u));
+  // User Administration Handlers (vía servidor, solo ADMIN - B2/C3)
+  const handleToggleUserStatus = async (userId: string) => {
     const u = users.find(x => x.id === userId);
-    if (u) {
+    if (!u) return;
+    try {
+      await updateUserProfile({ id: userId, isActive: !u.isActive });
       setToastMessage(`Estado de usuario ${u.name} alternado.`);
+      logAudit("USUARIO_ESTADO", `${u.name} ${u.isActive ? "desactivado" : "activado"}.`);
+    } catch (e: any) {
+      alert(e?.message || "No se pudo cambiar el estado del usuario.");
     }
   };
 
-  const handleUpdateUserRole = (userId: string, role: UserRole) => {
-    setUsers(prev => prev.map(u => u.id === userId ? { ...u, role } : u));
+  const handleUpdateUserRole = async (userId: string, role: UserRole) => {
     const u = users.find(x => x.id === userId);
-    if (u) {
-      setToastMessage(`Rol de ${u.name} actualizado a ${role}.`);
+    try {
+      await updateUserProfile({ id: userId, role });
+      setToastMessage(`Rol de ${u?.name || userId} actualizado a ${role}.`);
+      logAudit("USUARIO_ROL", `${u?.name || userId} ahora es ${role}.`);
+    } catch (e: any) {
+      alert(e?.message || "No se pudo actualizar el rol del usuario.");
     }
+  };
+
+  const handleCreateUser = async (payload: { email: string; password: string; name: string; role: UserRole; title?: string }) => {
+    const r = await createUserAccount(payload);
+    logAudit("USUARIO_CREADO", `${payload.name} (${payload.email}) rol ${payload.role}.`);
+    return r;
   };
 
   // Notification configuration handlers
@@ -1088,9 +1110,10 @@ export default function App() {
             <RoleManagement
               users={users}
               currentUser={currentUser}
-              onCreateUser={createUserAccount}
+              onCreateUser={handleCreateUser}
               onToggleUserStatus={handleToggleUserStatus}
               onUpdateUserRole={handleUpdateUserRole}
+              onChangePassword={changePassword}
             />
           )}
 

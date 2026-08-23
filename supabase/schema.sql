@@ -67,23 +67,26 @@ on conflict (key) do nothing;
 alter table public.app_data enable row level security;
 alter table public.users enable row level security;
 
--- Cualquier usuario autenticado puede leer/escribir los datos de negocio
+-- Cualquier usuario autenticado puede leer los datos de negocio
 -- (es una herramienta interna del holding; el control real está en el login).
 drop policy if exists "app_data_select_auth" on public.app_data;
 create policy "app_data_select_auth" on public.app_data
   for select using (auth.role() = 'authenticated');
 
+-- Escritura permitida EXCEPTO en la colección 'users' (la gestiona SOLO el
+-- servidor con service role y validación de rol ADMIN - seguridad B2/C3).
 drop policy if exists "app_data_insert_auth" on public.app_data;
 create policy "app_data_insert_auth" on public.app_data
-  for insert with check (auth.role() = 'authenticated');
+  for insert with check (auth.role() = 'authenticated' AND key <> 'users');
 
 drop policy if exists "app_data_update_auth" on public.app_data;
 create policy "app_data_update_auth" on public.app_data
-  for update using (auth.role() = 'authenticated');
+  for update using (auth.role() = 'authenticated' AND key <> 'users')
+  with check (key <> 'users');
 
 drop policy if exists "app_data_delete_auth" on public.app_data;
 create policy "app_data_delete_auth" on public.app_data
-  for delete using (auth.role() = 'authenticated');
+  for delete using (auth.role() = 'authenticated' AND key <> 'users');
 
 -- Perfiles: cada usuario solo ve/edita su propio perfil.
 drop policy if exists "users_select_own" on public.users;

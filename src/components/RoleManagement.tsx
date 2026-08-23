@@ -21,6 +21,7 @@ interface RoleManagementProps {
   onCreateUser: (payload: { email: string; password: string; name: string; role: UserRole; title?: string }) => Promise<any>;
   onToggleUserStatus: (userId: string) => void;
   onUpdateUserRole: (userId: string, role: UserRole) => void;
+  onChangePassword: (newPassword: string) => Promise<any>;
 }
 
 export default function RoleManagement({
@@ -29,6 +30,7 @@ export default function RoleManagement({
   onCreateUser,
   onToggleUserStatus,
   onUpdateUserRole,
+  onChangePassword,
 }: RoleManagementProps) {
   const [isAddingUser, setIsAddingUser] = useState(false);
   const [newName, setNewName] = useState("");
@@ -63,6 +65,22 @@ export default function RoleManagement({
       setCreatingError(err?.message || "No se pudo crear el usuario.");
     } finally {
       setIsCreating(false);
+    }
+  };
+
+  // Cambio de contraseña del usuario autenticado (self-service).
+  const handleChangePassword = async () => {
+    const newPass = prompt("Nueva contraseña (mínimo 6 caracteres):");
+    if (!newPass) return;
+    if (newPass.length < 6) {
+      alert("La contraseña debe tener al menos 6 caracteres.");
+      return;
+    }
+    try {
+      await onChangePassword(newPass);
+      alert("✓ Contraseña actualizada correctamente.");
+    } catch (e: any) {
+      alert(e?.message || "No se pudo cambiar la contraseña.");
     }
   };
 
@@ -330,6 +348,16 @@ export default function RoleManagement({
                     <span className="text-[10px] text-slate-400 font-semibold border border-slate-100 bg-slate-50 px-2 py-1 rounded-md">
                       Acceso con su propia credencial
                     </span>
+                  )}
+
+                  {/* Self password change */}
+                  {isSelf && (
+                    <button
+                      onClick={() => void handleChangePassword()}
+                      className="text-[10px] font-extrabold text-slate-600 border border-slate-200 hover:bg-slate-100 px-2.5 py-1 rounded-md transition-colors"
+                    >
+                      Cambiar contraseña
+                    </button>
                   )}
                 </div>
               </div>

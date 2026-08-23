@@ -21,6 +21,7 @@ import {
   Donation,
   ThresholdSetting,
   Notification,
+  AuditEntry,
 } from "../types";
 import { INITIAL_USERS, INITIAL_THRESHOLDS } from "../data";
 
@@ -37,6 +38,7 @@ export const APP_DATA_KEYS = [
   "donations",
   "thresholds",
   "notifications",
+  "auditLog",
 ] as const;
 
 export type AppDataKey = (typeof APP_DATA_KEYS)[number];
@@ -55,6 +57,7 @@ interface Setters {
   setDonations: (v: Donation[]) => void;
   setThresholds: (v: ThresholdSetting[]) => void;
   setNotifications: (v: Notification[]) => void;
+  setAuditLog: (v: AuditEntry[]) => void;
 }
 
 async function loadAllData(supabase: SupabaseClient, session: Session, setters: Setters) {
@@ -80,6 +83,7 @@ async function loadAllData(supabase: SupabaseClient, session: Session, setters: 
   if (Array.isArray(map.donations)) setters.setDonations(map.donations);
   if (Array.isArray(map.thresholds)) setters.setThresholds(map.thresholds);
   if (Array.isArray(map.notifications)) setters.setNotifications(map.notifications);
+  if (Array.isArray(map.auditLog)) setters.setAuditLog(map.auditLog);
 
   return map.users as UserProfile[] | undefined;
 }
@@ -121,6 +125,7 @@ export function useHoldingData() {
   const [donations, setDonations] = useState<Donation[]>([]);
   const [thresholds, setThresholds] = useState<ThresholdSetting[]>(INITIAL_THRESHOLDS);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [auditLog, setAuditLog] = useState<AuditEntry[]>([]);
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
 
   const clientRef = useRef<SupabaseClient | null>(null);
@@ -155,6 +160,7 @@ export function useHoldingData() {
               setDonations,
               setThresholds,
               setNotifications,
+              setAuditLog,
             });
             setCurrentUser(resolveCurrentUser(profiles || [], data.session));
           }
@@ -188,6 +194,7 @@ export function useHoldingData() {
       setDonations,
       setThresholds,
       setNotifications,
+      setAuditLog,
     });
     setSession(data.session);
     setCurrentUser(resolveCurrentUser(profiles || [], data.session));
@@ -204,9 +211,10 @@ export function useHoldingData() {
   }, []);
 
   // Persistencia debounced de todas las colecciones.
+  // NOTA: la colección "users" se gestiona SOLO desde el servidor (admin);
+  // el cliente no la escribe directamente (seguridad B2/C3).
   const allData = useMemo(
     () => ({
-      users,
       transactions,
       inventory,
       inventoryHistory,
@@ -218,8 +226,9 @@ export function useHoldingData() {
       donations,
       thresholds,
       notifications,
+      auditLog,
     }),
-    [users, transactions, inventory, inventoryHistory, purchaseOrders, estimates, serviceOrders, properties, programs, donations, thresholds, notifications]
+    [transactions, inventory, inventoryHistory, purchaseOrders, estimates, serviceOrders, properties, programs, donations, thresholds, notifications, auditLog]
   );
   const dataSnapshot = JSON.stringify(allData);
 
@@ -248,7 +257,15 @@ export function useHoldingData() {
     return () => clearTimeout(t);
   }, [dataSnapshot, session]);
 
-  // Crear usuario desde el panel de administraciÃ³n (requiere SUPABASE_SERVICE_ROLE_KEY).
+  // Recarga SOLO la colección de perfiles (users) desde la nube.
+  const reloadUsers = useCallback(async () => {
+    const supabase = clientRef.current;
+    if (!supabase) return;
+    const { data } = await supabase.from("app_data").select("value").eq("key", "users").maybeSingle();
+    if (Array.isArray(data?.value)) setUsers(data.value);
+  }, []);
+
+  // Crear usuario desde el panel de administración (requiere SUPABASE_SERVICE_ROLE_KEY).
   const createUserAccount = useCallback(
     async (payload: { email: string; password: string; name: string; role: UserRole; title?: string }) => {
       const res = await apiFetch("/api/auth/create-user", {
@@ -260,31 +277,61 @@ export function useHoldingData() {
       if (!res.ok || !data.ok) {
         throw new Error(data?.error || "No se pudo crear el usuario.");
       }
-      // Recargar perfiles desde la nube.
-      const supabase = clientRef.current;
-      if (supabase && sessionRef.current) {
-        const profiles = await loadAllData(supabase, sessionRef.current, {
-          setUsers,
-          setTransactions,
-          setInventory,
-          setInventoryHistory,
-          setPurchaseOrders,
-          setEstimates,
-          setServiceOrders,
-          setProperties,
-          setPrograms,
-          setDonations,
-          setThresholds,
-          setNotifications,
-        });
-        if (profiles) setUsers(profiles);
-      }
+      await reloadUsers();
       return data;
     },
-    []
+    [reloadUsers]
   );
 
+  // Actualizar rol/estado/título de un usuario (solo ADMIN, vía servidor).
+  const updateUserProfile = useCallback(
+    async (payload: { id: string; role?: UserRole; isActive?: boolean; title?: string }) => {
+      const res = await apiFetch("/api/auth/update-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) {
+        throw new Error(data?.error || "No se pudo actualizar el usuario.");
+      }
+      await reloadUsers();
+      return data;
+    },
+    [reloadUsers]
+  );
+
+  // Cambiar la propia contraseña (cualquier rol, sobre su cuenta).
+  const changePassword = useCallback(async (newPassword: string) => {
+    const res = await apiFetch("/api/auth/change-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ newPassword }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.ok) throw new Error(data?.error || "No se pudo cambiar la contraseña.");
+    return data;
+  }, []);
+
   const isAuthenticated = Boolean(session && currentUser);
+
+  // Auditoría de acciones sensibles (C4): se guarda en la nube.
+  const logAudit = useCallback(
+    (action: string, detail: string, companyId?: string) => {
+      setAuditLog((prev) => [
+        {
+          id: `AUD-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+          timestamp: new Date().toISOString(),
+          user: currentUser?.name || "Sistema",
+          action,
+          detail,
+          companyId,
+        },
+        ...prev,
+      ]);
+    },
+    [currentUser]
+  );
 
   return {
     config,
@@ -298,6 +345,8 @@ export function useHoldingData() {
     login,
     logout,
     createUserAccount,
+    updateUserProfile,
+    changePassword,
     // estado
     users,
     setUsers,
@@ -323,5 +372,7 @@ export function useHoldingData() {
     setThresholds,
     notifications,
     setNotifications,
+    auditLog,
+    logAudit,
   };
 }
