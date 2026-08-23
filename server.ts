@@ -11,8 +11,9 @@ dotenv.config({ path: ".env.local", override: true });
 
 // Modelo de Gemini configurable vÃ­a env (AI Studio inyecta los secrets).
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.6-flash";
-// Clave de Gemini: soporta GEMINI_API_KEY o GEMINI_API_KEY_2 (fallback para cuentas con Default Key fija).
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY_2 || "";
+// Clave de Gemini: se PRIORIZA GEMINI_API_KEY_2 (tu clave propia) sobre la
+// "Default Gemini Key" que AI Studio inyecta en GEMINI_API_KEY.
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY_2 || process.env.GEMINI_API_KEY || "";
 // Cadena de respaldo ante saturaciÃ³n (503) o modelos no disponibles (404).
 const GEMINI_FALLBACK_MODELS = (process.env.GEMINI_FALLBACK_MODELS || "gemini-3.7-flash,gemini-flash-latest")
   .split(",")
@@ -106,9 +107,9 @@ async function generateWithRetry(ai: any, contents: any, config: any) {
         const isMissing = status.includes("404") || str.includes("no longer available") || /not found|does not exist/i.test(str);
         const isQuota = status.includes("429") || str.includes('"code":429') || /quota|RESOURCE_EXHAUSTED/i.test(str);
         if (isCapacity || isQuota) {
-          // Esperar la espera sugerida por la API (o 10s) antes de reintentar.
+          // Esperar la espera sugerida por la API (máx. 12s) antes de reintentar.
           const retryMatch = str.match(/retry in (\d+(?:\.\d+)?)s/i);
-          const waitMs = Math.min(retryMatch ? parseFloat(retryMatch[1]) * 1000 : 10000, 25000);
+          const waitMs = Math.min(retryMatch ? parseFloat(retryMatch[1]) * 1000 : 8000, 12000);
           if (attempt < 2) {
             await sleepMs(waitMs);
             continue;
