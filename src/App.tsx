@@ -840,8 +840,8 @@ export default function App() {
           </div>
         </header>
 
-        {/* Dynamic Route Body Container */}
-        <div className="p-4 md:p-6 flex flex-col gap-6 flex-1 print:p-0">
+        {/* Dynamic Route Body Container - responsive: mobile p-4, tablet p-6, desktop p-8, TV constrained width */}
+        <div className="p-4 md:p-6 xl:p-8 flex flex-col gap-6 flex-1 print:p-0 w-full min-[1920px]:p-8 min-[2560px]:max-w-[1800px] min-[2560px]:mx-auto">
           
           {/* TAB 1: DASHBOARD AND CHARTS OVERVIEW */}
           {activeTab === "DASHBOARD" && (

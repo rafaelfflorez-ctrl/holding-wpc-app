@@ -1,0 +1,19 @@
+{
+  "name": "Matriz Maker Holding - Control General",
+  "short_name": "WPC Holding",
+  "description": "Plataforma matriz de control multi-compania: WPC Autopartes, She Maker, Raez Ingenieria, Helenamar.",
+  "theme_color": "#0f172a",
+  "background_color": "#f8fafc",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "lang": "es-CO",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
