@@ -64,7 +64,7 @@ async function requireAdmin(req: any) {
   return auth;
 }
 
-// Llama a Gemini probando varios modelos ante saturación temporal (HTTP 503).
+// Llama a Gemini probando varios modelos ante saturación temporal (HTTP 503) o cuota (429).
 async function generateWithRetry(ai: any, contents: any, config: any) {
   const models = [GEMINI_MODEL, ...GEMINI_FALLBACK_MODELS.filter((m) => m !== GEMINI_MODEL)];
   let lastErr: any = null;
@@ -76,21 +76,43 @@ async function generateWithRetry(ai: any, contents: any, config: any) {
       } catch (e: any) {
         lastErr = e;
         const str = JSON.stringify(e);
-        const isCapacity = String(e?.status || "").includes("503") || str.includes('"code":503');
-        const isMissing = String(e?.status || "").includes("404") || str.includes("no longer available") || /not found|does not exist/i.test(str);
-        if (isCapacity) {
+        const status = String(e?.status || "");
+        const isCapacity = status.includes("503") || str.includes('"code":503');
+        const isMissing = status.includes("404") || str.includes("no longer available") || /not found|does not exist/i.test(str);
+        const isQuota = status.includes("429") || str.includes('"code":429') || /quota|RESOURCE_EXHAUSTED/i.test(str);
+        if (isCapacity || isQuota) {
+          // Esperar la espera sugerida por la API (o 10s) antes de reintentar.
+          const retryMatch = str.match(/retry in (\d+(?:\.\d+)?)s/i);
+          const waitMs = Math.min(retryMatch ? parseFloat(retryMatch[1]) * 1000 : 10000, 25000);
           if (attempt < 2) {
-            await sleepMs(1500 * attempt);
+            await sleepMs(waitMs);
             continue;
           }
-          break; // saturado -> siguiente modelo
+          break; // saturado/quota -> siguiente modelo (cuota distinta por modelo)
         }
         if (isMissing) break; // no disponible -> siguiente modelo
-        throw e; // error real (auth, contenido, cuota) -> propagar
+        throw e; // error real (auth, contenido) -> propagar
       }
     }
   }
-  throw lastErr || new Error("Gemini no disponible (todos los modelos saturados).");
+  throw lastErr || new Error("Gemini no disponible (todos los modelos saturados o con cuota agotada).");
+}
+
+// Mapea un error de la API a un código HTTP útil para la respuesta al cliente.
+function statusFromError(e: any): number {
+  const s = String(e?.status || "");
+  const str = JSON.stringify(e);
+  if (s.includes("429") || str.includes('"code":429')) return 429;
+  if (s.includes("503") || str.includes('"code":503')) return 503;
+  if (s.includes("404") || str.includes('"code":404')) return 404;
+  return 500;
+}
+
+function friendlyGeminiError(e: any): string {
+  const status = statusFromError(e);
+  if (status === 429) return "Límite de cuota de Gemini alcanzado. Espera ~1 minuto o usa tu propia GEMINI_API_KEY con mayor límite.";
+  if (status === 503) return "Gemini está saturado temporalmente. Inténtalo de nuevo en unos segundos.";
+  return e?.message || "Error al procesar con Gemini.";
 }
 
 async function startServer() {
@@ -770,7 +792,8 @@ Mantén el estilo profesional, ordenado con viñetas, sin explicaciones técnica
         return res.status(error.status).json({ error: error.message });
       }
       console.error("Gemini Error:", error);
-      res.status(500).json({ error: error.message || "Error al conectar con el asesor de inteligencia artificial." });
+      const status = statusFromError(error);
+      res.status(status).json({ error: friendlyGeminiError(error) });
     }
   });
 
