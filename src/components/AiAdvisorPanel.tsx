@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { apiFetch } from "../lib/api";
 import { 
   Sparkles, 
@@ -33,6 +33,24 @@ export default function AiAdvisorPanel({ inventory, commercialProfits }: AiAdvis
   ]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [providerLabel, setProviderLabel] = useState("ASISTENTE CON GEMINI");
+
+  // Muestra el proveedor/modelo real configurado en el servidor.
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/config", { cache: "no-store" });
+        const cfg = await res.json();
+        if (cfg.aiProvider === "openai" && cfg.openaiModel) {
+          setProviderLabel(`ASISTENTE CON ${cfg.openaiModel.toUpperCase()}`);
+        } else {
+          setProviderLabel("ASISTENTE CON GEMINI");
+        }
+      } catch (e) {
+        /* mantiene el valor por defecto */
+      }
+    })();
+  }, []);
 
   // Predefined strategic recommendations
   const staticRecommendations = [
@@ -171,7 +189,7 @@ export default function AiAdvisorPanel({ inventory, commercialProfits }: AiAdvis
               <MessageSquare className="w-4 h-4 text-indigo-500" /> Canal de Consulta Rafael / Wendy
             </span>
             <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full text-[9px] font-bold">
-              ASISTENTE CON GEMINI
+              {providerLabel}
             </span>
           </div>
 

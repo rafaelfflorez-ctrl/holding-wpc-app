@@ -136,9 +136,40 @@ function statusFromError(e: any): number {
 
 function friendlyGeminiError(e: any): string {
   const status = statusFromError(e);
-  if (status === 429) return "LÃ­mite de cuota de Gemini alcanzado. Espera ~1 minuto o usa tu propia GEMINI_API_KEY con mayor lÃ­mite.";
-  if (status === 503) return "Gemini estÃ¡ saturado temporalmente. IntÃ©ntalo de nuevo en unos segundos.";
+  if (status === 429) return "Límite de cuota de Gemini alcanzado. Espera ~1 minuto o usa tu propia GEMINI_API_KEY con mayor límite.";
+  if (status === 503) return "Gemini está saturado temporalmente. Inténtalo de nuevo en unos segundos.";
   return e?.message || "Error al procesar con Gemini.";
+}
+
+// Proveedor alternativo para el ASESOR IA (solo texto): cualquier API compatible
+// con OpenAI Chat Completions (Groq, DeepSeek, OpenRouter, Cerebras, Together...).
+// Se activa con AI_PROVIDER=openai + OPENAI_BASE_URL + OPENAI_API_KEY + OPENAI_MODEL.
+async function callOpenAIChat(systemPrompt: string, userPrompt: string): Promise<string> {
+  const base = (process.env.OPENAI_BASE_URL || "").replace(/\/+$/, "");
+  const key = process.env.OPENAI_API_KEY || "";
+  const model = process.env.OPENAI_MODEL || "llama-3.3-70b-versatile";
+  if (!base || !key) {
+    throw new HttpError(500, "AI_PROVIDER=openai requiere OPENAI_BASE_URL y OPENAI_API_KEY en los secrets.");
+  }
+  const res = await fetch(`${base}/chat/completions`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+      temperature: 0.7,
+    }),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    const isQuota = res.status === 429 || /quota|rate.?limit/i.test(text);
+    throw new HttpError(isQuota ? 429 : res.status, isQuota ? "Cuota del proveedor de IA alcanzada. Intenta en un momento." : `El proveedor de IA respondió ${res.status}.`);
+  }
+  const data = await res.json();
+  return data?.choices?.[0]?.message?.content || "No se pudo generar respuesta.";
 }
 
 async function startServer() {
@@ -347,6 +378,9 @@ async function startServer() {
       hasGeminiKey: Boolean(GEMINI_API_KEY),
       hasServiceRole: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
       modelName: GEMINI_MODEL,
+      aiProvider: process.env.AI_PROVIDER || "gemini",
+      openaiModel: process.env.OPENAI_MODEL || "",
+      hasOpenAI: Boolean(process.env.OPENAI_API_KEY),
     });
   });
 
@@ -829,20 +863,6 @@ Importante:
         return res.status(429).json({ error: "Demasiadas solicitudes. Espera un momento." });
       }
       const { prompt, inventory, profits } = req.body;
-      const apiKey = GEMINI_API_KEY;
-      if (!apiKey) {
-        return res.status(400).json({ error: "Missing GEMINI_API_KEY in environment variables." });
-      }
-
-      // Initialize modern SDK
-      const ai = new GoogleGenAI({
-        apiKey,
-        httpOptions: {
-          headers: {
-            "User-Agent": "aistudio-build",
-          },
-        },
-      });
 
       const formatCurrency = (val: number) => {
         return new Intl.NumberFormat("es-CO", {
@@ -875,7 +895,27 @@ Responde de forma ejecutiva, altamente analÃ­tica y empÃ¡tica con Wendy (Con
 
 MantÃ©n el estilo profesional, ordenado con viÃ±etas, sin explicaciones tÃ©cnicas del cÃ³digo del bot, enfocado estrictamente en resultados empresariales.` + PROMPT_GUARD;
 
-      const response = await generateWithRetry(ai, prompt || "Analiza mi situaciÃ³n del holding actual.", {
+      const userPrompt = prompt || "Analiza mi situaciÃ³n del holding actual.";
+
+      // Proveedor configurable para el Asesor IA (solo texto).
+      // "openai" -> cualquier API compatible (Groq, DeepSeek, OpenRouter, Cerebras...).
+      // "gemini" -> Gemini (por defecto).
+      if (process.env.AI_PROVIDER === "openai") {
+        const reply = await callOpenAIChat(systemInstruction, userPrompt);
+        return res.json({ reply });
+      }
+
+      const apiKey = GEMINI_API_KEY;
+      if (!apiKey) {
+        return res.status(400).json({ error: "Missing GEMINI_API_KEY in environment variables (o configura AI_PROVIDER=openai)." });
+      }
+
+      const ai = new GoogleGenAI({
+        apiKey,
+        httpOptions: { headers: { "User-Agent": "aistudio-build" } },
+      });
+
+      const response = await generateWithRetry(ai, userPrompt, {
         systemInstruction,
         temperature: 0.7,
       });
