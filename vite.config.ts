@@ -20,5 +20,20 @@ export default defineConfig(() => {
       // Permitir acceso por túneles públicos en desarrollo (túneles trycloudflare/localtunnel).
       allowedHosts: true as const,
     },
+    build: {
+      rollupOptions: {
+        output: {
+          // Code-splitting: separa las librerías pesadas en chunks cacheables.
+          manualChunks: {
+            react: ['react', 'react-dom'],
+            charts: ['recharts'],
+            pdf: ['jspdf', 'html2canvas'],
+            excel: ['xlsx'],
+            ui: ['lucide-react', 'motion'],
+            supabase: ['@supabase/supabase-js'],
+          },
+        },
+      },
+    },
   };
 });
